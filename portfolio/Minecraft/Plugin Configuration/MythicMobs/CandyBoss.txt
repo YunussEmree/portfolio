@@ -1,0 +1,7 @@
+This mob configurated to a customer
+
+mob has +10 different skill
+It gets angry as her health decreases.
+
+
+showcase: https://youtu.be/8X1n3ZcpHKQ

@@ -1,0 +1,17 @@
+This plugin coded for Provanas Server and I'm continue to develop this plugin.
+
+You can set the dragon health/power/armor/speed/ability skill damage/ ability skill cooldown
+
+The Dragon has 2 skill -> Thunder / Dragon Fireball / (healing and rush skill will be coded)
+Thunder -> ThunderStorm to all near players(spesific radius)
+Dragon Fireball -> vanilla launch the dragon fireball
+
+The Dragon can summonable with 8 summoning eyes on altars
+
+The more eyes a player has placed and the more damage they have dealt, the more rewards they will receive.
+And the plugin including weight system for rewards. Example: if you place summoning eyes, you gain +500 weight and if you're the one who inflicted the most damage, you gain +300 weight. You can drop a 800 weight an item.
+You can specify probabilities for all rewards.
+
+You can watch plugin showcase video: https://youtu.be/AkQHTTFYscc
+
+NOT AVAILABLE FOR BUYING YET

@@ -1,0 +1,20 @@
+This plugin coded for provanas server
+
+plugin features: 
+- bug fixex(cause other plugins)
+- grappling hook(https://media.discordapp.net/attachments/547024792243535873/838561676214665266/Avalon-kanca.gif?width=402&height=225)
+- auto smelt pickaxe(https://media.discordapp.net/attachments/761592533679079445/839102571619680287/ezgif.com-gif-maker_1.gif?width=402&height=226)
+- explosive bow(https://media.discordapp.net/attachments/761592533679079445/838827209098657842/Hnet.com-image.gif?width=402&height=225)
+- homing bow(https://media.discordapp.net/attachments/761592533679079445/839102356947075072/ezgif.com-gif-maker.gif?width=402&height=226)
+- dungeon items(this items(swords and armors) can only usable in dungeon region)
+- afk zone(if you don't walk in 1 minute you will teleported to afk zone(only join time))
+- Hide and seek (Hideandseek server event)
+- Player chat ping(pinging player on chat)
+- Death money(if you are death you will lose your money depends on permission)
+- Prismarine Bow(if you have prismarine in your inventory, bow shoot a prismarine and hittings damage)
+- First join message( %player% join the server! Say hi)
+- Licence (because this plugin can't be shared)
+
+
+
+THIS PLUGIN CAN'T BUY
