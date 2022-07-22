@@ -1,0 +1,4 @@
+Xray notification plugin
+
+Spigot: https://www.spigotmc.org/resources/xray-check.103565/
+Github: https://github.com/YunussEmree/Minecraft-plugin-source-codes/tree/main/XRAY-CHECK
