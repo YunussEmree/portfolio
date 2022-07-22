@@ -4,3 +4,4 @@ When the damage increases too much, the number of hearts automatically increases
 
 Spigot Plugin Link: https://www.spigotmc.org/resources/✨-removing-heart-effects-✨-1-16-x.101619/
 Youtube Showcase Link: https://youtu.be/-R1cTFKrG_A
+Github: https://github.com/YunussEmree/Minecraft-plugin-source-codes/tree/main/No-Hearts
