@@ -1,4 +1,4 @@
 This plugin is setting the first join/join/quit messages
 
 spigot link: https://www.spigotmc.org/resources/first-join-messager-custom-first-join-join-and-quit-messages.103539/
-github link: https://github.com/YunussEmree/FIRSTJOINMESSAGER
+github link: https://github.com/YunussEmree/Minecraft-plugin-source-codes/tree/main/First%20Join%20Messager
