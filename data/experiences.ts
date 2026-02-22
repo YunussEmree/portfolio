@@ -4,6 +4,7 @@ export const experiences: Experience[] = [
   {
     role: "Freelance Software Developer",
     company: "Kritm Bilişim",
+    logo: "/logos/kritm.png",
     period: "Dec 2025 – Present",
     points: [
       "Delivered end-to-end solutions across multiple client projects, translating business requirements into maintainable software components.",
