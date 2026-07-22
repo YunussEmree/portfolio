@@ -6,32 +6,32 @@ export const skillCategories: SkillCategory[] = [
   {
     name: "Languages",
     accent: "cyan",
-    skills: ["Java", "TypeScript", "JavaScript", "Python", "SQL", "HTML/CSS"],
+    skills: ["Java", "TypeScript", "JavaScript", "Python", "SQL"],
   },
   {
     name: "Backend",
     accent: "blue",
-    skills: ["Spring Boot", "Spring Security", "Spring Data JPA", "NestJS", "Django", "REST API", "JWT", "OAuth2"],
+    skills: ["Spring Boot", "NestJS", "REST API", "GraphQL"],
   },
   {
     name: "Frontend",
     accent: "violet",
-    skills: ["Angular", "React", "Next.js"],
+    skills: ["Angular", "React"],
   },
   {
     name: "Database",
     accent: "emerald",
-    skills: ["PostgreSQL", "MySQL", "MongoDB", "Prisma"],
+    skills: ["PostgreSQL", "MongoDB"],
   },
   {
-    name: "DevOps & Tools",
+    name: "DevOps & CI/CD",
     accent: "orange",
-    skills: ["Docker", "Kubernetes", "Git", "GitLab CI", "Azure", "Swagger", "Postman", "CI/CD"],
+    skills: ["Docker", "Kubernetes", "GitHub", "GitLab", "CI/CD"],
   },
   {
     name: "AI / LLM",
     accent: "rose",
-    skills: ["LangChain", "RAG Workflows", "MCP", "Tool Agents"],
+    skills: ["LLM Integration", "RAG Workflows", "MCP"],
   },
 ];
 

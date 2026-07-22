@@ -2,21 +2,21 @@ import type { Project } from "../types";
 
 export const projects: Project[] = [
   {
-    title: "Real-Time Gause Tracking",
+    title: "ENGEREK",
+    desc: "TEKNOFEST 2026: Autonomous air defense system with real-time target detection and tracking (YOLO, OpenCV) on NVIDIA Jetson, integrated with microcontroller-driven actuation. Led a 13-member team as Team Captain.",
+    stack: ["Python", "YOLO", "OpenCV", "NVIDIA Jetson"],
+    links: { live: "#", repo: "#" },
+  },
+  {
+    title: "Real-Time Gauze Tracking",
     desc: "TÜBİTAK 2209-B: Real-time detection and tracking system to improve surgical safety and reduce manual counting errors during operations.",
     stack: ["Python", "PyTorch", "Django", "React"],
     links: { live: "#", repo: "#" },
   },
   {
     title: "Code Kiddo",
-    desc: "TEKNOFEST 2025 semi-finalist: AI-assisted interactive coding education platform for children with personalized learning, gamification, and adaptive content.",
+    desc: "TEKNOFEST semi-finalist: AI-assisted coding education platform for children (concept & prototype).",
     stack: ["Spring Boot", "MongoDB", "Flutter", "Next.js"],
-    links: { live: "#", repo: "#" },
-  },
-  {
-    title: "Mentor AI",
-    desc: "TEKNOFEST 2025: AI-driven digital mentorship platform with mentor recommendations, personalized matching, real-time messaging, and video sessions.",
-    stack: ["Spring Boot", "MongoDB", "JWT", "OAuth2", "WebSocket"],
     links: { live: "#", repo: "#" },
   },
   {
