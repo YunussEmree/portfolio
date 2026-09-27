@@ -1,50 +1,236 @@
 @import "tailwindcss";
 
-/* Class-based dark mode for Tailwind v4 */
+/* Class-based dark mode; dark is the default (set before paint in layout.tsx). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Design tokens. Components use these names only (bg-bg, text-muted, border-line, text-accent…). */
+:root {
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --surface-2: #efefeb;
+  --line: rgb(12 12 14 / 0.09);
+  --line-strong: rgb(12 12 14 / 0.16);
+  --fg: #0c0c0e;
+  --muted: #5d5f66;
+  --faint: #696b72;
+  --accent: #4f6f09;
+  --accent-fill: #cdf26a;
+  --accent-ink: #11160a;
+  --accent-soft: rgb(90 125 10 / 0.1);
+  --glow: rgb(160 205 40 / 0.18);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #09090b;
+  --surface: #111114;
+  --surface-2: #18181c;
+  --line: rgb(255 255 255 / 0.075);
+  --line-strong: rgb(255 255 255 / 0.14);
+  --fg: #ededef;
+  --muted: #9a9ba3;
+  --faint: #83848c;
+  --accent: #c6f36a;
+  --accent-fill: #c6f36a;
+  --accent-ink: #0d1006;
+  --accent-soft: rgb(198 243 106 / 0.1);
+  --glow: rgb(198 243 106 / 0.1);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-fill: var(--accent-fill);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+
+  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--accent-soft);
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
 html {
-  scroll-behavior: smooth;
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5.5rem;
 }
 
 body {
+  background: var(--bg);
+  color: var(--fg);
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Scrollbar – light */
-::-webkit-scrollbar {
-  width: 5px;
+::selection {
+  background: var(--accent-fill);
+  color: var(--accent-ink);
 }
 
-::-webkit-scrollbar-track {
-  background: #fafafa;
+/* In the base layer so utilities (outline-none on the command input) can override it. */
+@layer base {
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 4px;
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+@layer components {
+  /* The page column: 16px gutters on phones, 1200px wide on desktop. */
+  .container-page {
+    width: 100%;
+    max-width: 75rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  .display {
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+  }
+
+  .serif-accent {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* Faint grid behind the hero, faded at the edges. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+  }
+
+  .prose-case p + p {
+    margin-top: 1rem;
+  }
 }
 
-/* Scrollbar – dark */
-.dark ::-webkit-scrollbar-track {
-  background: #09090b;
+/* Scroll reveal (components/reveal.tsx). Without JavaScript the content simply shows (noscript style in layout). */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-y, 18px), 0);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s);
+}
+[data-reveal][data-shown] {
+  opacity: 1;
+  transform: none;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+/* Hero entrance: pure CSS so it runs before hydration; the headline itself never waits. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+.rise {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+/* Command menu (components/command-menu.tsx). */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.fade-in {
+  animation: fade-in 0.15s ease both;
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.98);
+  }
+}
+.pop-in {
+  animation: pop-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Focus rings */
-*:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  html,
+  body {
+    background: white !important;
+  }
 }

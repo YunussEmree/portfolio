@@ -1,39 +1,20 @@
-import type { SkillCategory } from "../types";
+import type { SkillGroup } from "../types";
 
-// Edit these categories to update your skills section.
-// accent options: "blue" | "violet" | "emerald" | "orange" | "cyan" | "rose"
-export const skillCategories: SkillCategory[] = [
-  {
-    name: "Languages",
-    accent: "cyan",
-    skills: ["Java", "TypeScript", "JavaScript", "Python", "SQL"],
-  },
+/** Only what I have used in shipped or production work. */
+export const skillGroups: SkillGroup[] = [
+  { name: "Languages", skills: ["Java", "TypeScript", "Dart", "Python", "SQL"] },
   {
     name: "Backend",
-    accent: "blue",
-    skills: ["Spring Boot", "NestJS", "REST API", "GraphQL"],
+    skills: ["Spring Boot", "Spring Security", "NestJS", "Node.js", "REST", "GraphQL", "Django"],
+  },
+  { name: "Web & mobile", skills: ["Angular", "React", "Next.js", "Flutter"] },
+  {
+    name: "Data",
+    skills: ["PostgreSQL", "MongoDB", "Firestore", "Firebase Realtime DB", "Flyway"],
   },
   {
-    name: "Frontend",
-    accent: "violet",
-    skills: ["Angular", "React"],
+    name: "Infrastructure",
+    skills: ["Docker", "Kubernetes", "GitHub Actions", "GitLab CI", "nginx", "Linux", "Sentry"],
   },
-  {
-    name: "Database",
-    accent: "emerald",
-    skills: ["PostgreSQL", "MongoDB"],
-  },
-  {
-    name: "DevOps & CI/CD",
-    accent: "orange",
-    skills: ["Docker", "Kubernetes", "GitHub", "GitLab", "CI/CD"],
-  },
-  {
-    name: "AI / LLM",
-    accent: "rose",
-    skills: ["LLM Integration", "RAG Workflows", "MCP"],
-  },
+  { name: "AI", skills: ["LLM integration", "Claude API", "RAG", "MCP", "Agent tooling"] },
 ];
-
-// Flat list (auto-generated from categories, no need to edit)
-export const skills: string[] = skillCategories.flatMap((c) => c.skills);

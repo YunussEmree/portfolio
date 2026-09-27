@@ -1,104 +1,121 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
-import SmoothScroll from "@/components/SmoothScroll";
-import ThemeProvider from "@/components/ThemeProvider";
+import Providers from "@/components/providers";
 import { PROFILE } from "@/data/profile";
+import { experiences } from "@/data/experiences";
+import { EDUCATION } from "@/data/profile";
+import { skillGroups } from "@/data/skills";
 
-const inter = Inter({
-  subsets: ["latin"],
+const geist = Geist({ subsets: ["latin", "latin-ext"], variable: "--font-geist", display: "swap" });
+// Only the body face is preloaded; the mono labels and the serif accent may arrive a moment later.
+const geistMono = Geist_Mono({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-geist-mono",
   display: "swap",
-  preload: true,
-  adjustFontFallback: true,
-  fallback: ["system-ui", "-apple-system", "sans-serif"],
+  preload: false,
+});
+const instrument = Instrument_Serif({
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument",
+  display: "swap",
+  preload: false,
 });
 
-// Update SITE_URL to your actual domain before deploying
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? PROFILE.site;
+const TITLE = `${PROFILE.name} — ${PROFILE.role}`;
+const DESCRIPTION = PROFILE.bio;
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#09090b",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f6f3" },
+  ],
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: `${PROFILE.name} | Backend Developer`,
-  description: PROFILE.bio,
+  title: { default: TITLE, template: `%s · ${PROFILE.name}` },
+  description: DESCRIPTION,
   keywords: [
-    "backend developer",
+    "backend engineer",
+    "software engineer",
     "spring boot",
     "java",
     "nestjs",
-    "django",
-    "software engineer",
-    "react",
-    "typescript",
+    "node.js",
+    "flutter",
+    "firebase",
+    "angular",
+    "docker",
     "antalya",
-    "turkey",
-    "full stack developer",
-    "yunus emre şenyiğit",
+    "türkiye",
+    PROFILE.name,
   ],
-  authors: [{ name: PROFILE.name }],
+  authors: [{ name: PROFILE.name, url: SITE_URL }],
   creator: PROFILE.name,
-  alternates: {
-    canonical: SITE_URL,
-  },
+  alternates: { canonical: "/" },
   openGraph: {
-    title: `${PROFILE.name} | Backend Developer`,
-    description: PROFILE.bio,
+    title: TITLE,
+    description: DESCRIPTION,
     url: SITE_URL,
-    type: "website",
+    type: "profile",
     locale: "en_US",
-    siteName: `${PROFILE.name} Portfolio`,
-    images: [
-      {
-        url: "/profile.jpg",
-        width: 800,
-        height: 800,
-        alt: `${PROFILE.name} – Backend Developer`,
-      },
-    ],
+    siteName: PROFILE.name,
+    firstName: "Yunus Emre",
+    lastName: "Şenyiğit",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: `${PROFILE.name} | Backend Developer`,
-    description: PROFILE.bio,
-    images: ["/profile.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } },
+};
+
+/** Structured data so search engines understand who this page is about. */
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  mainEntity: {
+    "@type": "Person",
+    name: PROFILE.name,
+    jobTitle: PROFILE.role,
+    url: SITE_URL,
+    image: `${SITE_URL}${PROFILE.photo}`,
+    email: `mailto:${PROFILE.email}`,
+    address: { "@type": "PostalAddress", addressLocality: "Antalya", addressCountry: "TR" },
+    sameAs: [PROFILE.github, PROFILE.linkedin],
+    worksFor: experiences
+      .filter((e) => e.roles.some((r) => r.period.includes("Present")))
+      .map((e) => ({ "@type": "Organization", name: e.company, ...(e.url ? { url: e.url } : {}) })),
+    alumniOf: { "@type": "CollegeOrUniversity", name: EDUCATION.school },
+    knowsAbout: skillGroups.flatMap((g) => g.skills),
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Dark unless the visitor picked light before; runs before the first paint so the theme never flashes.
+const themeScript = `try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',t!=='light')}catch(e){document.documentElement.classList.add('dark')}`;
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${geist.variable} ${geistMono.variable} ${instrument.variable}`}
+      suppressHydrationWarning
+    >
       <head>
-        {/* Prevent flash of wrong theme: apply dark class before first paint */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <noscript>
+          <style>{"[data-reveal]{opacity:1!important;transform:none!important}"}</style>
+        </noscript>
         <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}`,
-          }}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
       </head>
-      <body className={`${inter.className} bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased`}>
-        <ThemeProvider>
-          <SmoothScroll>{children}</SmoothScroll>
-        </ThemeProvider>
+      <body className="min-h-dvh font-sans antialiased">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

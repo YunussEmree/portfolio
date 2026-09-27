@@ -2,50 +2,84 @@ import type { Experience } from "../types";
 
 export const experiences: Experience[] = [
   {
-    role: "Part-Time Software Developer",
-    company: "Sarıtay Bilişim A.Ş",
-    logo: "/logos/saritay.png",
-    period: "Oct 2025 – Present",
-    points: [
-      "Improved AI-agent service performance through profiling and targeted refactoring, reducing latency and compute usage by up to 70%.",
-      "Optimized system-to-system API workflows to reduce platform load and improve real-time responsiveness.",
-      "Mentored a 7-member software internship team over a 1.5-month program, guiding their technical development and daily workflow.",
-      "Strengthened reliability by improving error handling, architecture consistency, and execution stability across services.",
+    company: "EngerekTech",
+    logo: "/logos/engerektech.svg",
+    url: "https://engerektech.com",
+    location: "Antalya",
+    about: "My software studio: web, mobile and enterprise software.",
+    roles: [
+      {
+        title: "Founder & Software Engineer",
+        period: "2026 – Present",
+        points: [
+          "Built and run KPSS Düello, a realtime quiz-duel app with server-verified scoring, matchmaking, leagues and in-app purchases (Flutter, Firebase, Cloud Functions).",
+          "Built the company platform: Angular SSR site and blog, Spring Boot API and an internal portal, shipped as containers through GitHub Actions to a self-managed Linux server.",
+          "Automated content with the Claude API: sourced blog drafts with an SEO check, automatic English translations and release notes written for testers.",
+          "Set up and operate company email (Mailu, Postfix, Rspamd) with SPF, DKIM and DMARC.",
+        ],
+      },
     ],
   },
   {
-    role: "Software Developer Intern",
-    company: "Sarıtay Bilişim A.Ş",
+    company: "Sarıtay Bilişim A.Ş.",
     logo: "/logos/saritay.png",
-    period: "Jul 2025 – Aug 2025",
-    points: [
-      "Contributed to backend development for production services, improving real-time streaming and inter-service integration patterns.",
-      "Supported containerized deployment and CI/CD workflows using Docker, Kubernetes, and GitLab CI.",
-      "Implemented secure authentication flows using Spring Security and Azure OAuth-based access patterns.",
-      "Enhanced assistant capabilities by contributing to retrieval workflows, memory mechanisms, and tool-driven execution features.",
+    location: "Antalya",
+    about: "Enterprise software and AI assistant services.",
+    roles: [
+      {
+        title: "Part-Time Software Developer",
+        period: "Oct 2025 – Present",
+        points: [
+          "Cut latency and compute usage of AI-agent services by up to 70% through profiling and targeted refactoring.",
+          "Optimized system-to-system API workflows to reduce platform load and improve real-time responsiveness.",
+          "Mentored a 7-person internship team over a 1.5-month program.",
+          "Improved error handling, architecture consistency and execution stability across services.",
+        ],
+      },
+      {
+        title: "Software Developer Intern",
+        period: "Jul 2025 – Aug 2025",
+        points: [
+          "Worked on backend services in production, improving real-time streaming and service-to-service integration.",
+          "Supported containerized deployment and CI/CD with Docker, Kubernetes and GitLab CI.",
+          "Implemented authentication with Spring Security and Azure OAuth.",
+          "Contributed retrieval, memory and tool-execution features to the AI assistant.",
+        ],
+      },
     ],
   },
   {
-    role: "Backend Developer",
     company: "Burdur Mehmet Akif Ersoy University",
     logo: "/logos/maku.png",
-    period: "Mar 2025 – Jun 2025",
-    points: [
-      "Led backend development for an internship automation platform, coordinating a team of 12 developers and driving technical execution.",
-      "Designed and implemented robust REST APIs to streamline workflows and improve operational efficiency across the application.",
-      "Collaborated with frontend and stakeholders to ensure seamless integration, timely delivery, and stable feature releases.",
+    location: "Burdur",
+    about: "Internship automation platform for the university.",
+    roles: [
+      {
+        title: "Backend Developer",
+        period: "Mar 2025 – Jun 2025",
+        points: [
+          "Led backend development of the internship automation platform, coordinating 12 developers.",
+          "Designed and implemented the REST APIs behind the application's workflows.",
+          "Worked with the frontend team and stakeholders to ship stable releases on time.",
+        ],
+      },
     ],
   },
   {
-    role: "Freelance Software Developer",
     company: "Kritm Bilişim",
     logo: "/logos/kritm.png",
-    period: "Jan 2025 – Apr 2025",
-    points: [
-      "Delivered end-to-end solutions across multiple client projects, translating business requirements into maintainable software components.",
-      "Built scalable, component-driven interfaces using Angular, prioritizing usability, consistency, and long-term maintainability.",
-      "Developed backend services and integrations using Django, designing clean REST APIs and data-driven workflows.",
-      "Automated data cleaning and migration workflows with Python, transforming Excel-based datasets into SQL-ready structures for reporting.",
+    location: "Antalya",
+    about: "Client projects as a freelancer.",
+    roles: [
+      {
+        title: "Freelance Software Developer",
+        period: "Jan 2025 – Apr 2025",
+        points: [
+          "Delivered client projects end to end, from requirements to maintainable software.",
+          "Built component-driven interfaces in Angular and backend services with Django REST APIs.",
+          "Automated Excel-to-SQL data cleaning and migration with Python for reporting.",
+        ],
+      },
     ],
   },
 ];
