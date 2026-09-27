@@ -10,14 +10,14 @@ export default function ProfileCard() {
   ];
 
   return (
-    <figure className="card group overflow-hidden shadow-2xl shadow-black/5 dark:shadow-black/40">
+    <figure className="card overflow-hidden shadow-2xl shadow-black/5 dark:shadow-black/40">
       <div className="relative aspect-square overflow-hidden bg-surface-2">
         <Image
           src={PROFILE.photo}
           alt={`Portrait of ${PROFILE.name}`}
           fill
           sizes="(min-width: 1280px) 380px, (min-width: 1024px) 45vw, 100vw"
-          className="object-cover object-[50%_8%] grayscale contrast-[1.05] transition duration-700 group-hover:grayscale-0"
+          className="object-cover object-[50%_8%]"
         />
       </div>
       <figcaption className="p-5 sm:p-6">
