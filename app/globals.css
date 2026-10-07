@@ -282,6 +282,180 @@ html.lenis body {
   animation: check-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Easter eggs (components/fun). */
+@keyframes logo-boop {
+  30% {
+    transform: scale(0.82) rotate(-8deg);
+  }
+  60% {
+    transform: scale(1.12) rotate(6deg);
+  }
+}
+.logo-boop {
+  animation: logo-boop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.96);
+  }
+}
+.toast-in {
+  animation: toast-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes trophy-pop {
+  0% {
+    transform: scale(0.3) rotate(-25deg);
+  }
+  55% {
+    transform: scale(1.18) rotate(8deg);
+  }
+}
+.trophy-pop {
+  animation: trophy-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* Footer bug: legs scuttle while it walks; it flattens when squashed and drops back in after. */
+.footer-bug {
+  transition: color 0.2s;
+}
+@keyframes bug-legs {
+  50% {
+    transform: scaleY(0.82) translateY(1px);
+  }
+}
+.footer-bug[data-walking="true"] .bug-legs {
+  transform-origin: center;
+  animation: bug-legs 0.22s steps(2) infinite;
+}
+@keyframes bug-squash {
+  25% {
+    transform: scale(1.3, 0.3);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.4, 0.2);
+    opacity: 0;
+  }
+}
+.bug-squash {
+  display: grid;
+  /* Waits for the hammer to land (~0.3s into its swing). */
+  animation: bug-squash 0.6s ease-out 0.3s forwards;
+}
+
+/* Portrait speech bubble. */
+@keyframes bubble-pop {
+  0% {
+    opacity: 0;
+    transform: translate3d(-6px, 8px, 0) scale(0.7);
+  }
+  60% {
+    transform: translate3d(0, -2px, 0) scale(1.05);
+  }
+}
+.bubble-pop {
+  transform-origin: bottom left;
+  animation: bubble-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20%,
+  60% {
+    transform: rotate(16deg);
+  }
+  40%,
+  80% {
+    transform: rotate(-10deg);
+  }
+}
+.wave {
+  transform-origin: 70% 80%;
+  animation: wave 0.9s ease-in-out 0.15s;
+}
+
+/* The hammer pivots around the end of its handle, like a wrist. */
+@keyframes hammer-swing {
+  0% {
+    opacity: 0;
+    transform: rotate(-20deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  38% {
+    transform: rotate(-62deg);
+  }
+  45% {
+    transform: rotate(0deg);
+  }
+  56% {
+    transform: rotate(-12deg);
+  }
+  66% {
+    transform: rotate(0deg);
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: rotate(0deg);
+  }
+}
+.hammer-swing {
+  transform-origin: 97% 43%;
+  animation: hammer-swing 0.8s cubic-bezier(0.5, 0, 0.5, 1) both;
+}
+@keyframes hammer-impact {
+  from {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+.hammer-impact {
+  animation: hammer-impact 0.4s ease-out 0.36s both;
+}
+@keyframes debugged-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -16px) scale(1.08);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -24px) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -32px) scale(1);
+  }
+}
+.debugged-pop {
+  animation: debugged-pop 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
+}
+@keyframes bug-respawn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+.bug-respawn {
+  display: grid;
+  animation: bug-respawn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Reading progress under the nav, driven by scroll alone (no JavaScript); hidden where unsupported. */
 .scroll-progress {
   display: none;
@@ -311,6 +485,15 @@ html.lenis body {
   [data-reveal] .draw-line {
     transform: none;
     transition: none;
+  }
+  /* No swing: just say it was debugged. */
+  .hammer-swing,
+  .hammer-impact {
+    display: none;
+  }
+  .debugged-pop {
+    animation: none;
+    transform: translate(-50%, -20px);
   }
   *,
   *::before,

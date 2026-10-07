@@ -6,7 +6,10 @@ import {
   CornerDownLeft,
   FileText,
   FolderGit2,
+  Gamepad2,
+  Lightbulb,
   Mail,
+  RotateCw,
   Search,
   SunMoon,
   User,
@@ -15,6 +18,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { projects } from "@/data/projects";
 import { PROFILE } from "@/data/profile";
+import { FUN } from "@/data/fun";
+import { HINT_EVENT, OPEN_SNAKE } from "./fun/achievements";
+import { barrelRoll } from "./fun/effects";
 import { GitHubIcon, LinkedInIcon } from "./icons";
 import { useTheme } from "./providers";
 
@@ -22,7 +28,7 @@ export const OPEN_COMMAND_MENU = "open-command-menu";
 
 type Item = {
   id: string;
-  group: "Go to" | "Case studies" | "Actions";
+  group: "Go to" | "Case studies" | "Actions" | "Fun";
   label: string;
   hint?: string;
   icon: React.ReactNode;
@@ -130,6 +136,38 @@ export default function CommandMenu() {
           requestAnimationFrame(() => toggle());
         },
       },
+      {
+        id: "snake",
+        group: "Fun",
+        label: `Play ${FUN.snake.title}`,
+        hint: "a tiny game",
+        icon: <Gamepad2 />,
+        run: () => {
+          close();
+          window.dispatchEvent(new Event(OPEN_SNAKE));
+        },
+      },
+      {
+        id: "hint",
+        group: "Fun",
+        label: "Give me a hint",
+        hint: "secrets on this site",
+        icon: <Lightbulb />,
+        run: () => {
+          close();
+          window.dispatchEvent(new Event(HINT_EVENT));
+        },
+      },
+      {
+        id: "barrel-roll",
+        group: "Fun",
+        label: "Do a barrel roll",
+        icon: <RotateCw />,
+        run: () => {
+          close();
+          requestAnimationFrame(barrelRoll);
+        },
+      },
     ],
     [close, goToSection, router, toggle],
   );
@@ -176,7 +214,7 @@ export default function CommandMenu() {
     }
   };
 
-  const groups = ["Go to", "Case studies", "Actions"] as const;
+  const groups = ["Go to", "Case studies", "Actions", "Fun"] as const;
 
   return (
     <>

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import Footer from "@/components/footer";
+import FunLayer from "@/components/fun/fun-layer";
+import PlaySnakeButton from "@/components/fun/play-snake-button";
+import { FUN } from "@/data/fun";
 import Nav from "@/components/nav";
 
 export default function NotFound() {
@@ -19,9 +22,11 @@ export default function NotFound() {
           >
             Back to the home page
           </Link>
+          <PlaySnakeButton label={FUN.playSnake} className="mt-5 text-sm text-muted transition hover:text-fg" />
         </section>
       </main>
       <Footer />
+      <FunLayer />
     </>
   );
 }

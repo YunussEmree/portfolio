@@ -3,6 +3,7 @@
 import Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { flushSync } from "react-dom";
+import { THEME_EVENT } from "./fun/achievements";
 
 type Theme = "dark" | "light";
 type Point = { x: number; y: number };
@@ -26,6 +27,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const toggle = useCallback((origin?: Point) => {
     const root = document.documentElement;
     const next: Theme = root.classList.contains("dark") ? "light" : "dark";
+    window.dispatchEvent(new Event(THEME_EVENT));
     const apply = () => {
       root.classList.toggle("dark", next === "dark");
       setTheme(next);

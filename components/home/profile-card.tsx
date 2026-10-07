@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { EDUCATION, LANGUAGES, PROFILE } from "@/data/profile";
+import PhotoGreeter from "../fun/photo-greeter";
 
 /** Portrait and the facts a recruiter looks for first: where, what, which languages. */
 export default function ProfileCard() {
@@ -11,7 +12,7 @@ export default function ProfileCard() {
 
   return (
     <figure className="group card overflow-hidden shadow-2xl shadow-black/5 dark:shadow-black/40">
-      <div className="relative aspect-square overflow-hidden bg-surface-2">
+      <PhotoGreeter className="relative block aspect-square w-full overflow-hidden bg-surface-2">
         <Image
           src={PROFILE.photo}
           alt={`Portrait of ${PROFILE.name}`}
@@ -19,7 +20,7 @@ export default function ProfileCard() {
           sizes="(min-width: 1280px) 380px, (min-width: 1024px) 45vw, 100vw"
           className="object-cover object-[50%_8%] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
         />
-      </div>
+      </PhotoGreeter>
       <figcaption className="p-5 sm:p-6">
         <p className="font-medium tracking-tight text-fg">{PROFILE.name}</p>
         <p className="text-sm text-muted">{PROFILE.role}</p>

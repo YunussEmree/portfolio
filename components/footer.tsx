@@ -1,13 +1,23 @@
+import { FUN } from "@/data/fun";
 import { PROFILE } from "@/data/profile";
+import { FooterBug, FunStats } from "./fun/footer-bug";
+import PlaySnakeButton from "./fun/play-snake-button";
 import { GitHubIcon, LinkedInIcon } from "./icons";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line">
+    <footer className="relative border-t border-line">
+      <FooterBug />
       <div className="container-page flex flex-col gap-6 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>
-          © {new Date().getFullYear()} {PROFILE.name}. Designed and built by me with Next.js.
-        </p>
+        <div className="space-y-1.5">
+          <p>
+            © {new Date().getFullYear()} {PROFILE.name}. Designed and built by me with Next.js.
+          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <FunStats />
+            <PlaySnakeButton label={FUN.snake.title} className="font-mono text-[0.7rem] text-faint transition hover:text-accent" />
+          </div>
+        </div>
         <div className="flex items-center gap-5">
           <a href={PROFILE.github} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-fg">
             <GitHubIcon /> GitHub

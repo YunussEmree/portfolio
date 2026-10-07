@@ -1,5 +1,6 @@
 import CommandMenu from "@/components/command-menu";
 import Footer from "@/components/footer";
+import FunLayer from "@/components/fun/fun-layer";
 import Nav from "@/components/nav";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +16,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <main id="main">{children}</main>
       <Footer />
       <CommandMenu />
+      <FunLayer />
     </>
   );
 }

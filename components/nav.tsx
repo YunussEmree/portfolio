@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { PROFILE } from "@/data/profile";
 import { OPEN_COMMAND_MENU } from "./command-menu";
+import { unlock } from "./fun/achievements";
+import { confetti } from "./fun/effects";
 import { useTheme } from "./providers";
 
 export const NAV_ITEMS = [
@@ -49,6 +51,20 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
   const listRef = useRef<HTMLUListElement>(null);
   const [pill, setPill] = useState({ left: 0, width: 0, visible: false });
+  // Easter egg: five quick clicks on the logo.
+  const logoClicks = useRef<number[]>([]);
+  const [boops, setBoops] = useState(0);
+  const onLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const now = Date.now();
+    logoClicks.current = [...logoClicks.current.filter((t) => now - t < 1600), now];
+    setBoops((n) => n + 1);
+    if (logoClicks.current.length >= 5) {
+      logoClicks.current = [];
+      const r = e.currentTarget.getBoundingClientRect();
+      confetti({ x: r.left + 16, y: r.top + r.height / 2, count: 70, power: 0.8 });
+      unlock("logo");
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -100,8 +116,8 @@ export default function Nav() {
         className="scroll-progress pointer-events-none absolute inset-x-0 -bottom-px h-0.5 origin-left bg-accent-fill"
       />
       <nav className="container-page flex h-16 items-center justify-between gap-4" aria-label="Main">
-        <Link href="/" className="group flex items-center gap-2.5" aria-label={`${PROFILE.name}, home`}>
-          <span className="grid size-8 place-items-center rounded-lg bg-fg font-mono text-[0.7rem] font-semibold tracking-tight text-bg transition group-hover:bg-accent-fill group-hover:text-accent-ink">
+        <Link href="/" onClick={onLogoClick} className="group flex items-center gap-2.5" aria-label={`${PROFILE.name}, home`}>
+          <span key={boops} className={`${boops ? "logo-boop " : ""}grid size-8 place-items-center rounded-lg bg-fg font-mono text-[0.7rem] font-semibold tracking-tight text-bg transition group-hover:bg-accent-fill group-hover:text-accent-ink`}>
             YE
           </span>
           <span className="hidden text-sm font-medium tracking-tight text-fg sm:block">{PROFILE.name}</span>
