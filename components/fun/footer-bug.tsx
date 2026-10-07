@@ -138,7 +138,7 @@ export function FunStats() {
   const { bugs, found } = useFunStats();
   return (
     <p className="font-mono text-[0.7rem] text-faint">
-      <span className="tabular-nums">{bugs}</span> {FUN.stats.bugs} ·{" "}
+      <span className="tabular-nums">{bugs}</span> {bugs === 1 ? FUN.stats.bug : FUN.stats.bugs} ·{" "}
       <button
         type="button"
         onClick={() => window.dispatchEvent(new Event(HINT_EVENT))}

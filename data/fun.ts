@@ -20,7 +20,7 @@ export const FUN = {
     detail: "You found every secret on this site. Shall we build something together?",
     cta: "Say hi",
   },
-  stats: { bugs: "bugs fixed", secrets: "secrets found", hint: "Get a hint" },
+  stats: { bug: "bug fixed", bugs: "bugs fixed", secrets: "secrets found", hint: "Get a hint" },
   hint: { label: "Hint", none: "You already found everything. Impressive." },
   sudoAgain: "Permission denied. Still.",
   bug: "Squash the bug",
