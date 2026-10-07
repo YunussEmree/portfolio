@@ -225,25 +225,11 @@ export const sideProjects: SideProject[] = [
     stack: ["Python", "YOLO", "OpenCV", "NVIDIA Jetson"],
   },
   {
-    title: "Real-time gauze tracking",
-    context: "TÜBİTAK 2209-B",
-    year: "2026",
-    desc: "Detects and tracks surgical gauze in real time to reduce manual counting errors during operations.",
-    stack: ["Python", "PyTorch", "Django", "React"],
-  },
-  {
     title: "Instagram content automation",
     context: "EngerekTech",
     year: "2026",
     desc: "Prepares and publishes a daily post for the apps' Instagram accounts from their question and word banks, rendered with an on-brand template.",
     stack: ["Spring Boot", "Java 2D", "Instagram Graph API"],
-  },
-  {
-    title: "Code Kiddo",
-    context: "TEKNOFEST · Semi-finalist",
-    year: "2025",
-    desc: "AI-assisted coding education platform for children, from concept to prototype.",
-    stack: ["Spring Boot", "MongoDB", "Flutter", "Next.js"],
   },
   {
     title: "SosyalizBiz",

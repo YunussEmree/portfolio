@@ -61,14 +61,9 @@ export const RECOGNITION: Recognition[] = [
     year: "2026",
   },
   {
-    title: "TÜBİTAK 2209-B — two research projects",
-    detail: "Real-time surgical gauze tracking (2026) and Fungify, AI image classification (2024).",
-    year: "2024–26",
-  },
-  {
-    title: "TEKNOFEST — Semi-finalist, Code Kiddo",
-    detail: "AI-assisted coding education platform for children.",
-    year: "2025",
+    title: "TÜBİTAK 2209-B — Fungify",
+    detail: "Research project on AI-assisted image classification.",
+    year: "2024",
   },
   {
     title: "Gençlik Hackathonu — SosyalizBiz",
