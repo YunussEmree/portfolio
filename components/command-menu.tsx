@@ -125,8 +125,9 @@ export default function CommandMenu() {
         label: "Toggle light / dark theme",
         icon: <SunMoon />,
         run: () => {
-          toggle();
+          // Close first so the menu is not part of the snapshot the theme transition animates.
           close();
+          requestAnimationFrame(() => toggle());
         },
       },
     ],

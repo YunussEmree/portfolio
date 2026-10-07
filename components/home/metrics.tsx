@@ -1,4 +1,5 @@
 import { METRICS } from "@/data/profile";
+import CountUp from "../count-up";
 import Reveal from "../reveal";
 
 export default function Metrics() {
@@ -13,7 +14,9 @@ export default function Metrics() {
             } ${i >= 2 ? "border-t lg:border-t-0" : ""} lg:px-8 lg:first:pl-0 ${i > 0 ? "lg:border-l" : ""}`}
           >
             <Reveal delay={i * 0.06}>
-              <p className="display text-[clamp(2.4rem,4.4vw,3.5rem)] text-fg">{m.value}</p>
+              <p className="display text-[clamp(2.4rem,4.4vw,3.5rem)] text-fg">
+                <CountUp value={m.value} />
+              </p>
               <p className="mt-2 text-sm font-medium text-fg">{m.label}</p>
               <p className="mt-1.5 text-[0.8rem] leading-relaxed text-muted">{m.context}</p>
             </Reveal>

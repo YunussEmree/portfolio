@@ -3,7 +3,7 @@
 import { Command, Menu, Moon, Sun, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PROFILE } from "@/data/profile";
 import { OPEN_COMMAND_MENU } from "./command-menu";
 import { useTheme } from "./providers";
@@ -17,14 +17,26 @@ export const NAV_ITEMS = [
 
 export function ThemeToggle() {
   const { theme, toggle } = useTheme();
+  // Bumped on every click so only a real toggle (not the first render) spins the new icon in.
+  const [swaps, setSwaps] = useState(0);
   return (
     <button
       type="button"
-      onClick={toggle}
-      className="grid size-9 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg"
+      onClick={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        setSwaps((n) => n + 1);
+        toggle({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      }}
+      className="group grid size-9 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg"
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
     >
-      {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      <span key={swaps} className={swaps ? "icon-swap" : undefined}>
+        {theme === "dark" ? (
+          <Sun className="size-4 transition-transform duration-500 ease-out group-hover:rotate-90" />
+        ) : (
+          <Moon className="size-4 transition-transform duration-500 ease-out group-hover:-rotate-12" />
+        )}
+      </span>
     </button>
   );
 }
@@ -35,6 +47,8 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLUListElement>(null);
+  const [pill, setPill] = useState({ left: 0, width: 0, visible: false });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -57,6 +71,18 @@ export default function Nav() {
     return () => io.disconnect();
   }, [home]);
 
+  // One pill slides between the links instead of each link fading its own background.
+  useEffect(() => {
+    const update = () => {
+      const el = active ? listRef.current?.querySelector<HTMLElement>(`[data-id="${active}"]`) : null;
+      setPill((p) => (el ? { left: el.offsetLeft, width: el.offsetWidth, visible: true } : { ...p, visible: false }));
+    };
+    update();
+    document.fonts?.ready.then(update);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [active]);
+
   useEffect(() => setOpen(false), [pathname]);
 
   const href = (id: string) => (home ? `#${id}` : `/#${id}`);
@@ -69,6 +95,10 @@ export default function Nav() {
           : "border-b border-transparent"
       }`}
     >
+      <span
+        aria-hidden="true"
+        className="scroll-progress pointer-events-none absolute inset-x-0 -bottom-px h-0.5 origin-left bg-accent-fill"
+      />
       <nav className="container-page flex h-16 items-center justify-between gap-4" aria-label="Main">
         <Link href="/" className="group flex items-center gap-2.5" aria-label={`${PROFILE.name}, home`}>
           <span className="grid size-8 place-items-center rounded-lg bg-fg font-mono text-[0.7rem] font-semibold tracking-tight text-bg transition group-hover:bg-accent-fill group-hover:text-accent-ink">
@@ -77,13 +107,19 @@ export default function Nav() {
           <span className="hidden text-sm font-medium tracking-tight text-fg sm:block">{PROFILE.name}</span>
         </Link>
 
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul ref={listRef} className="relative hidden items-center gap-1 md:flex">
+          <li
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 rounded-full bg-surface-2 transition-[left,width,opacity] duration-300 ease-out"
+            style={{ left: pill.left, width: pill.width, opacity: pill.visible ? 1 : 0 }}
+          />
           {NAV_ITEMS.map((item) => (
             <li key={item.id}>
               <a
                 href={href(item.id)}
-                className={`rounded-full px-3.5 py-1.5 text-sm transition-colors duration-300 ${
-                  active === item.id ? "bg-surface-2 text-fg" : "text-muted hover:text-fg"
+                data-id={item.id}
+                className={`relative block rounded-full px-3.5 py-1.5 text-sm transition-colors duration-300 ${
+                  active === item.id ? "text-fg" : "text-muted hover:text-fg"
                 }`}
                 aria-current={active === item.id ? "true" : undefined}
               >

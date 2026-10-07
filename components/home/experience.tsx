@@ -22,7 +22,7 @@ export default function Experience() {
         <ol className="border-t border-line">
           {experiences.map((e) => (
             <li key={e.company} className="border-b border-line">
-              <Reveal className="grid gap-6 py-10 md:grid-cols-12 md:gap-10 md:py-12">
+              <Reveal className="group/exp grid gap-6 py-10 md:grid-cols-12 md:gap-10 md:py-12">
                 <div className="md:col-span-4">
                   <div className="flex items-center gap-4 md:sticky md:top-24">
                     {e.logo && (
@@ -57,7 +57,7 @@ export default function Experience() {
                       <ul className="mt-4 space-y-2.5">
                         {r.points.map((pt) => (
                           <li key={pt} className="flex gap-3 text-[0.95rem] leading-relaxed text-muted">
-                            <span className="mt-[0.65rem] size-1 shrink-0 rounded-full bg-faint" aria-hidden="true" />
+                            <span className="mt-[0.65rem] size-1 shrink-0 rounded-full bg-faint transition-colors duration-500 group-hover/exp:bg-accent" aria-hidden="true" />
                             <span>{pt}</span>
                           </li>
                         ))}

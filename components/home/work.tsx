@@ -58,7 +58,7 @@ function FeaturedProject({ index }: { index: number }) {
           <ul className="mt-6 space-y-3">
             {p.highlights.slice(0, 3).map((h) => (
               <li key={h} className="flex gap-3 text-[0.94rem] leading-relaxed text-muted">
-                <span className="mt-[0.6rem] h-px w-3 shrink-0 bg-accent" aria-hidden="true" />
+                <span className="mt-[0.6rem] h-px w-3 shrink-0 origin-left bg-accent transition-transform duration-500 ease-out group-hover:scale-x-150" aria-hidden="true" />
                 <span>{h}</span>
               </li>
             ))}

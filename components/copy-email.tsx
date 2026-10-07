@@ -28,7 +28,7 @@ export default function CopyEmail({ email, className = "" }: { email: string; cl
         className="relative grid size-8 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg"
         aria-label={copied ? "Email address copied" : "Copy email address"}
       >
-        {copied ? <Check className="size-3.5 text-accent" /> : <Copy className="size-3.5" />}
+        {copied ? <Check className="check-pop size-3.5 text-accent" /> : <Copy className="size-3.5" />}
         <span className="sr-only" aria-live="polite">
           {copied ? "Copied" : ""}
         </span>

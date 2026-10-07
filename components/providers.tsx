@@ -2,10 +2,12 @@
 
 import Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 type Theme = "dark" | "light";
+type Point = { x: number; y: number };
 
-const ThemeContext = createContext<{ theme: Theme; toggle: () => void }>({
+const ThemeContext = createContext<{ theme: Theme; toggle: (origin?: Point) => void }>({
   theme: "dark",
   toggle: () => {},
 });
@@ -20,15 +22,46 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   }, []);
 
-  const toggle = useCallback(() => {
-    const next: Theme = document.documentElement.classList.contains("dark") ? "light" : "dark";
-    document.documentElement.classList.toggle("dark", next === "dark");
-    setTheme(next);
-    try {
-      localStorage.setItem("theme", next);
-    } catch {
-      /* private mode: the choice lasts for this visit */
+  /** Switches the theme in one step; with View Transitions the new theme grows as a circle from `origin`. */
+  const toggle = useCallback((origin?: Point) => {
+    const root = document.documentElement;
+    const next: Theme = root.classList.contains("dark") ? "light" : "dark";
+    const apply = () => {
+      root.classList.toggle("dark", next === "dark");
+      setTheme(next);
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        /* private mode: the choice lasts for this visit */
+      }
+    };
+
+    // Elements with their own color transitions would otherwise change at different speeds.
+    root.classList.add("theme-switching");
+    const done = () => requestAnimationFrame(() => root.classList.remove("theme-switching"));
+
+    const doc = document as Document & {
+      startViewTransition?: (update: () => void) => { ready: Promise<void>; finished: Promise<void> };
+    };
+    if (!doc.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      apply();
+      done();
+      return;
     }
+
+    const x = origin?.x ?? window.innerWidth / 2;
+    const y = origin?.y ?? window.innerHeight / 2;
+    const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+    const transition = doc.startViewTransition(() => flushSync(apply));
+    transition.ready
+      .then(() => {
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 600, easing: "cubic-bezier(0.22, 1, 0.36, 1)", pseudoElement: "::view-transition-new(root)" },
+        );
+      })
+      .catch(() => {});
+    transition.finished.finally(done);
   }, []);
 
   useEffect(() => {

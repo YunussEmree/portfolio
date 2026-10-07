@@ -13,7 +13,7 @@ function Headline({ text }: { text: string }) {
         <span key={l} className="block">
           {line.split(/(\*[^*]+\*)/).map((part, i) =>
             part.startsWith("*") ? (
-              <em key={i} className="serif-accent pr-1 text-accent">
+              <em key={i} className="serif-accent ink-underline pr-1 text-accent">
                 {part.slice(1, -1)}
               </em>
             ) : (

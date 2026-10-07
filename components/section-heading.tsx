@@ -14,7 +14,7 @@ export default function SectionHeading({ index, label, title, intro, id }: Props
     <Reveal className="mb-12 grid gap-6 md:mb-16 md:grid-cols-12">
       <p className="eyebrow flex items-center gap-3 md:col-span-3 md:pt-3">
         <span className="text-accent">{index}</span>
-        <span className="h-px w-6 bg-line-strong" aria-hidden="true" />
+        <span className="draw-line h-px w-6 bg-line-strong" aria-hidden="true" />
         {label}
       </p>
       <div className="md:col-span-9">
