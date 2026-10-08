@@ -15,7 +15,7 @@ export type AchievementId =
 
 export const ACHIEVEMENTS: { id: AchievementId; title: string; detail: string; hint: string }[] = [
   { id: "logo", title: "Persistent", detail: "Clicked the logo five times in a row.", hint: "Logos like attention. Lots of it, quickly." },
-  { id: "bugs", title: "Exterminator", detail: "Fixed a bug in the footer.", hint: "There are bugs in the footer. Somebody should fix them." },
+  { id: "bugs", title: "Exterminator", detail: "Squashed a bug crawling across the screen.", hint: "Every now and then a bug crawls across the screen. Squash it." },
   { id: "konami", title: "Old school", detail: "Entered the Konami code. Do a barrel roll!", hint: "↑ ↑ ↓ ↓ … you know the rest." },
   { id: "snake", title: "Snake charmer", detail: "Scored 10 in Packet Snake.", hint: "Packet Snake in the arcade: score 10." },
   { id: "whack", title: "Bug bounty", detail: "Scored 20 in Whack-a-Bug.", hint: "Whack-a-Bug in the arcade: score 20. Red bugs count triple." },

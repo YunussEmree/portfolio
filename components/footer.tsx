@@ -1,13 +1,12 @@
 import { FUN } from "@/data/fun";
 import { PROFILE } from "@/data/profile";
-import { FooterBug, FunStats } from "./fun/footer-bug";
+import FunStats from "./fun/fun-stats";
 import ArcadeButton from "./fun/arcade-button";
 import { GitHubIcon, LinkedInIcon } from "./icons";
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-line">
-      <FooterBug />
+    <footer className="border-t border-line">
       <div className="container-page flex flex-col gap-6 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1.5">
           <p>

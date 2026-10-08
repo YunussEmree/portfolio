@@ -7,6 +7,7 @@ import { ACHIEVEMENTS, FUN, type GameId } from "@/data/fun";
 import { PROFILE } from "@/data/profile";
 import { ACHIEVEMENT_EVENT, HINT_EVENT, OPEN_ARCADE, THEME_EVENT, unlock, unlockedAchievements } from "./achievements";
 import { barrelRoll, confetti, emojiRain } from "./effects";
+import ScreenBug from "./screen-bug";
 
 // The arcade and its games only download when someone opens it.
 const Arcade = dynamic(() => import("./arcade"), { ssr: false });
@@ -154,6 +155,7 @@ export default function FunLayer() {
 
   return (
     <>
+      <ScreenBug />
       {arcade !== undefined && <Arcade initial={arcade} onClose={() => setArcade(undefined)} />}
       <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-6 right-4 z-[120] sm:right-6">
         {toast && (

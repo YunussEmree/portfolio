@@ -316,16 +316,17 @@ html.lenis body {
   animation: trophy-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 
-/* Footer bug: legs scuttle while it walks; it flattens when squashed and drops back in after. */
-.footer-bug {
+/* Screen bug (components/fun/screen-bug.tsx): legs scuttle while it walks; it flattens when squashed. */
+.screen-bug {
   transition: color 0.2s;
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.35));
 }
 @keyframes bug-legs {
   50% {
     transform: scaleY(0.82) translateY(1px);
   }
 }
-.footer-bug[data-walking="true"] .bug-legs {
+.screen-bug[data-walking="true"] .bug-legs {
   transform-origin: center;
   animation: bug-legs 0.22s steps(2) infinite;
 }
@@ -514,17 +515,6 @@ html.lenis body {
 .debugged-pop {
   animation: debugged-pop 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
 }
-@keyframes bug-respawn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-.bug-respawn {
-  display: grid;
-  animation: bug-respawn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 /* Reading progress under the nav, driven by scroll alone (no JavaScript); hidden where unsupported. */
 .scroll-progress {
   display: none;
