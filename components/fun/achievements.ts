@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ACHIEVEMENTS, type AchievementId } from "@/data/fun";
+import { ACHIEVEMENTS, type AchievementId, type GameId } from "@/data/fun";
 
 export const ACHIEVEMENT_EVENT = "fun:achievement";
 export const BUGS_EVENT = "fun:bugs";
-export const OPEN_SNAKE = "fun:open-snake";
+export const OPEN_ARCADE = "fun:open-arcade";
 export const HINT_EVENT = "fun:hint";
 export const THEME_EVENT = "fun:theme";
 
@@ -56,8 +56,13 @@ export function fixBug(): number {
     /* the count lasts for this visit */
   }
   window.dispatchEvent(new Event(BUGS_EVENT));
-  if (next >= 5) unlock("bugs");
+  unlock("bugs");
   return next;
+}
+
+/** Opens the arcade dialog, on the picker or straight into `game`. */
+export function openArcade(game?: GameId) {
+  window.dispatchEvent(new CustomEvent(OPEN_ARCADE, { detail: { game: game ?? null } }));
 }
 
 /** Live counts for the footer: bugs fixed and secrets found. */

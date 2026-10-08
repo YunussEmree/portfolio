@@ -3,13 +3,13 @@
 import { Lightbulb, Terminal, Trophy } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { ACHIEVEMENTS, FUN } from "@/data/fun";
+import { ACHIEVEMENTS, FUN, type GameId } from "@/data/fun";
 import { PROFILE } from "@/data/profile";
-import { ACHIEVEMENT_EVENT, HINT_EVENT, OPEN_SNAKE, THEME_EVENT, unlock, unlockedAchievements } from "./achievements";
+import { ACHIEVEMENT_EVENT, HINT_EVENT, OPEN_ARCADE, THEME_EVENT, unlock, unlockedAchievements } from "./achievements";
 import { barrelRoll, confetti, emojiRain } from "./effects";
 
-// The game only downloads when someone opens it.
-const Snake = dynamic(() => import("./snake"), { ssr: false });
+// The arcade and its games only download when someone opens it.
+const Arcade = dynamic(() => import("./arcade"), { ssr: false });
 
 const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
 const TOTAL = ACHIEVEMENTS.length;
@@ -20,13 +20,14 @@ const ICONS = { achievement: Trophy, complete: Trophy, hint: Lightbulb, terminal
 
 /**
  * Easter eggs shared by every page: the Konami code, secret words, the console, tab title, theme spam,
- * hints, achievement toasts and the Packet Snake game.
+ * hints, achievement toasts and the arcade.
  */
 export default function FunLayer() {
   const [toast, setToast] = useState<Toast | null>(null);
-  const [snake, setSnake] = useState(false);
-  const snakeOpen = useRef(false);
-  snakeOpen.current = snake;
+  // undefined: closed; null: the game picker; otherwise the game being played.
+  const [arcade, setArcade] = useState<GameId | null | undefined>(undefined);
+  const arcadeOpen = useRef(false);
+  arcadeOpen.current = arcade !== undefined;
   const timer = useRef(0);
 
   const show = (t: Omit<Toast, "key">, ms = 3800) => {
@@ -70,7 +71,7 @@ export default function FunLayer() {
     let typed = "";
     const onKey = (e: KeyboardEvent) => {
       const el = e.target instanceof Element ? e.target : null;
-      if (snakeOpen.current || e.metaKey || e.ctrlKey || el?.closest("input, textarea, [contenteditable='true']")) return;
+      if (arcadeOpen.current || e.metaKey || e.ctrlKey || el?.closest("input, textarea, [contenteditable='true']")) return;
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       // A third "up" keeps the last two as the start of the code.
       pos = key === KONAMI[pos] ? pos + 1 : key === "ArrowUp" ? (pos === 2 ? 2 : 1) : 0;
@@ -92,12 +93,12 @@ export default function FunLayer() {
         emojiRain("☕");
       }
     };
-    const onOpen = () => setSnake(true);
+    const onOpen = (e: Event) => setArcade((e as CustomEvent<{ game: GameId | null }>).detail?.game ?? null);
     window.addEventListener("keydown", onKey);
-    window.addEventListener(OPEN_SNAKE, onOpen);
+    window.addEventListener(OPEN_ARCADE, onOpen);
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener(OPEN_SNAKE, onOpen);
+      window.removeEventListener(OPEN_ARCADE, onOpen);
     };
   }, []);
 
@@ -153,7 +154,7 @@ export default function FunLayer() {
 
   return (
     <>
-      {snake && <Snake onClose={() => setSnake(false)} />}
+      {arcade !== undefined && <Arcade initial={arcade} onClose={() => setArcade(undefined)} />}
       <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-6 right-4 z-[120] sm:right-6">
         {toast && (
           <div

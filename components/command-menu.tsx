@@ -18,8 +18,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { projects } from "@/data/projects";
 import { PROFILE } from "@/data/profile";
-import { FUN } from "@/data/fun";
-import { HINT_EVENT, OPEN_SNAKE } from "./fun/achievements";
+import { FUN, GAMES } from "@/data/fun";
+import { HINT_EVENT, openArcade } from "./fun/achievements";
 import { barrelRoll } from "./fun/effects";
 import { GitHubIcon, LinkedInIcon } from "./icons";
 import { useTheme } from "./providers";
@@ -137,16 +137,26 @@ export default function CommandMenu() {
         },
       },
       {
-        id: "snake",
+        id: "arcade",
         group: "Fun",
-        label: `Play ${FUN.snake.title}`,
-        hint: "a tiny game",
+        label: FUN.arcade.open,
+        hint: `${GAMES.length} small games`,
         icon: <Gamepad2 />,
         run: () => {
           close();
-          window.dispatchEvent(new Event(OPEN_SNAKE));
+          openArcade();
         },
       },
+      ...GAMES.map<Item>((g) => ({
+        id: `game-${g.id}`,
+        group: "Fun",
+        label: `Play ${g.title}`,
+        icon: <Gamepad2 />,
+        run: () => {
+          close();
+          openArcade(g.id);
+        },
+      })),
       {
         id: "hint",
         group: "Fun",

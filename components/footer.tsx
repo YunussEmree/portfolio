@@ -1,7 +1,7 @@
 import { FUN } from "@/data/fun";
 import { PROFILE } from "@/data/profile";
 import { FooterBug, FunStats } from "./fun/footer-bug";
-import PlaySnakeButton from "./fun/play-snake-button";
+import ArcadeButton from "./fun/arcade-button";
 import { GitHubIcon, LinkedInIcon } from "./icons";
 
 export default function Footer() {
@@ -15,7 +15,7 @@ export default function Footer() {
           </p>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <FunStats />
-            <PlaySnakeButton label={FUN.snake.title} className="font-mono text-[0.7rem] text-faint transition hover:text-accent" />
+            <ArcadeButton label={FUN.arcade.title} className="font-mono text-[0.7rem] text-faint transition hover:text-accent" />
           </div>
         </div>
         <div className="flex items-center gap-5">

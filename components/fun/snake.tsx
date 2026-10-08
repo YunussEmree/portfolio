@@ -1,18 +1,19 @@
 "use client";
 
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FUN } from "@/data/fun";
+import { FUN, GAMES } from "@/data/fun";
 import { unlock } from "./achievements";
 import { confetti } from "./effects";
+import { readBest, saveBest } from "./scores";
 
 type P = { x: number; y: number };
 type Phase = "ready" | "playing" | "paused" | "over";
 
+const META = GAMES.find((g) => g.id === "snake")!;
 const N = 18; // cells per side
 const CELL = 18; // CSS pixels per cell at full size
 const SIZE = N * CELL;
-const BEST_KEY = "snake-best";
 const DIRS: Record<string, P> = {
   ArrowUp: { x: 0, y: -1 },
   ArrowDown: { x: 0, y: 1 },
@@ -22,14 +23,6 @@ const DIRS: Record<string, P> = {
   s: { x: 0, y: 1 },
   a: { x: -1, y: 0 },
   d: { x: 1, y: 0 },
-};
-
-const readBest = () => {
-  try {
-    return Number(localStorage.getItem(BEST_KEY)) || 0;
-  } catch {
-    return 0;
-  }
 };
 
 const fresh = () => ({
@@ -44,10 +37,9 @@ const fresh = () => ({
   score: 0,
 });
 
-/** A small Snake game in a dialog: the snake eats API requests and gets faster. */
-export default function Snake({ onClose }: { onClose: () => void }) {
+/** Packet Snake: the snake eats API requests and gets faster. Rendered inside the arcade dialog. */
+export default function Snake() {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const dialog = useRef<HTMLDivElement>(null);
   const game = useRef(fresh());
   const phaseRef = useRef<Phase>("ready");
   const [phase, setPhaseState] = useState<Phase>("ready");
@@ -59,7 +51,7 @@ export default function Snake({ onClose }: { onClose: () => void }) {
     setPhaseState(p);
   };
 
-  useEffect(() => setBest(readBest()), []);
+  useEffect(() => setBest(readBest(META.bestKey) ?? 0), []);
 
   const placeFood = () => {
     const g = game.current;
@@ -108,14 +100,7 @@ export default function Snake({ onClose }: { onClose: () => void }) {
       const hitSelf = g.snake.slice(0, -1).some((s) => s.x === head.x && s.y === head.y);
       if (hitWall || hitSelf) {
         setPhase("over");
-        if (g.score > readBest()) {
-          try {
-            localStorage.setItem(BEST_KEY, String(g.score));
-          } catch {
-            /* best score lasts for this visit */
-          }
-        }
-        setBest((b) => Math.max(b, g.score));
+        setBest(saveBest(META.bestKey, g.score));
         return;
       }
       g.snake.unshift(head);
@@ -190,13 +175,10 @@ export default function Snake({ onClose }: { onClose: () => void }) {
     };
   }, []);
 
-  // Keyboard: arrows/WASD steer, Space pauses, Esc closes. The page must not scroll underneath.
+  // Keyboard: arrows/WASD steer, Space pauses (the arcade handles Esc). The page must not scroll underneath.
   useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    dialog.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      if (key === "Escape") return onClose();
       if (DIRS[key]) {
         e.preventDefault();
         steer(DIRS[key]);
@@ -207,11 +189,8 @@ export default function Snake({ onClose }: { onClose: () => void }) {
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      previous?.focus();
-    };
-  }, [onClose, primary, steer]);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [primary, steer]);
 
   // Swipe on touch screens; a tap starts or restarts.
   const touch = useRef<P | null>(null);
@@ -234,82 +213,53 @@ export default function Snake({ onClose }: { onClose: () => void }) {
   const pad = "grid size-12 place-items-center rounded-xl border border-line bg-surface-2 text-fg active:bg-line";
 
   return (
-    <div
-      className="fade-in fixed inset-0 z-[105] flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div
-        ref={dialog}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="snake-title"
-        tabIndex={-1}
-        className="pop-in w-full max-w-[24rem] rounded-2xl border border-line-strong bg-surface p-4 shadow-2xl shadow-black/40 outline-none sm:p-5"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 id="snake-title" className="font-semibold tracking-tight text-fg">
-              {FUN.snake.title}
-            </h2>
-            <p className="text-sm text-muted">{FUN.snake.subtitle}</p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid size-8 shrink-0 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg"
-            aria-label="Close game"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between font-mono text-xs text-muted" aria-live="polite">
-          <span>
-            {FUN.snake.score} <span className="text-fg tabular-nums">{score}</span>
-          </span>
-          <span>
-            {FUN.snake.best} <span className="text-fg tabular-nums">{Math.max(best, score)}</span>
-          </span>
-        </div>
-
-        <div className="relative mt-2 overflow-hidden rounded-xl border border-line">
-          <canvas
-            ref={canvas}
-            className="block aspect-square w-full touch-none select-none"
-            onPointerDown={onPointerDown}
-            onPointerUp={onPointerUp}
-            aria-label={`${FUN.snake.title} board`}
-          />
-          {overlay && (
-            <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-surface/85 px-4 py-3 text-center text-sm font-medium text-fg backdrop-blur">
-              {phase === "over" && (
-                <span className="block font-mono text-xs text-muted">
-                  {FUN.snake.score} {score}
-                </span>
-              )}
-              {overlay}
-            </p>
-          )}
-        </div>
-
-        <div className="mx-auto mt-4 hidden w-fit grid-cols-3 gap-2 [@media(pointer:coarse)]:grid">
-          <span />
-          <button type="button" className={pad} onClick={() => steer(DIRS.ArrowUp)} aria-label="Up">
-            <ArrowUp className="size-5" />
-          </button>
-          <span />
-          <button type="button" className={pad} onClick={() => steer(DIRS.ArrowLeft)} aria-label="Left">
-            <ArrowLeft className="size-5" />
-          </button>
-          <button type="button" className={pad} onClick={() => steer(DIRS.ArrowDown)} aria-label="Down">
-            <ArrowDown className="size-5" />
-          </button>
-          <button type="button" className={pad} onClick={() => steer(DIRS.ArrowRight)} aria-label="Right">
-            <ArrowRight className="size-5" />
-          </button>
-        </div>
-        <p className="mt-3 text-center font-mono text-[0.68rem] text-faint [@media(pointer:coarse)]:hidden">{FUN.snake.keys}</p>
+    <div>
+      <div className="flex items-center justify-between font-mono text-xs text-muted" aria-live="polite">
+        <span>
+          {FUN.score} <span className="text-fg tabular-nums">{score}</span>
+        </span>
+        <span>
+          {FUN.best} <span className="text-fg tabular-nums">{Math.max(best, score)}</span>
+        </span>
       </div>
+
+      <div className="relative mt-2 overflow-hidden rounded-xl border border-line">
+        <canvas
+          ref={canvas}
+          className="block aspect-square w-full touch-none select-none"
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          aria-label={`${META.title} board`}
+        />
+        {overlay && (
+          <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-surface/85 px-4 py-3 text-center text-sm font-medium text-fg backdrop-blur">
+            {phase === "over" && (
+              <span className="block font-mono text-xs text-muted">
+                {FUN.score} {score}
+              </span>
+            )}
+            {overlay}
+          </p>
+        )}
+      </div>
+
+      <div className="mx-auto mt-4 hidden w-fit grid-cols-3 gap-2 [@media(pointer:coarse)]:grid">
+        <span />
+        <button type="button" className={pad} onClick={() => steer(DIRS.ArrowUp)} aria-label="Up">
+          <ArrowUp className="size-5" />
+        </button>
+        <span />
+        <button type="button" className={pad} onClick={() => steer(DIRS.ArrowLeft)} aria-label="Left">
+          <ArrowLeft className="size-5" />
+        </button>
+        <button type="button" className={pad} onClick={() => steer(DIRS.ArrowDown)} aria-label="Down">
+          <ArrowDown className="size-5" />
+        </button>
+        <button type="button" className={pad} onClick={() => steer(DIRS.ArrowRight)} aria-label="Right">
+          <ArrowRight className="size-5" />
+        </button>
+      </div>
+      <p className="mt-3 text-center font-mono text-[0.68rem] text-faint [@media(pointer:coarse)]:hidden">{FUN.snake.keys}</p>
     </div>
   );
 }

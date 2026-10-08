@@ -378,6 +378,75 @@ html.lenis body {
   animation: wave 0.9s ease-in-out 0.15s;
 }
 
+/* Arcade: Whack-a-Bug */
+@keyframes whack-pop {
+  from {
+    transform: translateY(70%) scaleY(0.6);
+  }
+  70% {
+    transform: translateY(-4%) scaleY(1.05);
+  }
+}
+.whack-pop {
+  animation: whack-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes score-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -8px) scale(1.15);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -22px) scale(1);
+  }
+}
+.score-pop {
+  animation: score-pop 0.6s ease-out 0.2s both;
+}
+
+/* Arcade: Stack Match cards flip in 3D. */
+.flip-card {
+  perspective: 600px;
+}
+.flip-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.flip-card:hover .flip-inner:not(.is-flipped) {
+  transform: rotateY(12deg);
+}
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 0.9rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-front {
+  transform: rotateY(180deg);
+}
+@keyframes match-pop {
+  50% {
+    transform: rotateY(180deg) scale(1.08);
+  }
+}
+.flip-inner.is-matched {
+  animation: match-pop 0.4s ease-out;
+}
+
 /* The hammer pivots around the end of its handle, like a wrist. */
 @keyframes hammer-swing {
   0% {
@@ -484,6 +553,9 @@ html.lenis body {
   }
   [data-reveal] .draw-line {
     transform: none;
+    transition: none;
+  }
+  .flip-inner {
     transition: none;
   }
   /* No swing: just say it was debugged. */

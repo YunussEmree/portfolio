@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ACHIEVEMENTS, FUN } from "@/data/fun";
 import { fixBug, HINT_EVENT, useFunStats } from "./achievements";
+import { BugIcon, HammerIcon } from "./icons";
 
 const BUG = 28; // px
 
@@ -99,24 +100,14 @@ export function FooterBug() {
         className="footer-bug pointer-events-auto absolute left-0 top-0 grid size-7 place-items-center text-faint hover:text-accent"
       >
         <span className={squashed ? "bug-squash" : "bug-respawn"}>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
-            <path className="bug-legs" d="M7.5 10 4 8M7 14H3.5M7.5 18 4 20M16.5 10 20 8M17 14h3.5M16.5 18l3.5 2" />
-            <path d="M10 5.5 8.5 3M14 5.5 15.5 3" />
-            <ellipse cx="12" cy="14.5" rx="5" ry="6" fill="currentColor" fillOpacity="0.18" />
-            <circle cx="12" cy="7" r="2.6" fill="var(--bg)" />
-            <path d="M12 9v11.5" />
-          </svg>
+          <BugIcon />
         </span>
       </button>
 
       {hit && (
         <span key={hit.n} aria-hidden="true" className="absolute top-0" style={{ left: hit.x }}>
           {/* Hammer: winds up around the hand, slams onto the bug, bounces and fades. */}
-          <svg viewBox="0 0 36 22" width="36" height="22" className="hammer-swing absolute -top-[9px] left-2 text-fg">
-            <rect x="12" y="7.5" width="23" height="4" rx="2" fill="var(--muted)" />
-            <rect x="1" y="1" width="11" height="16" rx="2.5" fill="currentColor" />
-            <rect x="1" y="13" width="11" height="2" fill="var(--bg)" opacity="0.25" />
-          </svg>
+          <HammerIcon className="hammer-swing absolute -top-[9px] left-2 text-fg" />
           {/* Impact lines around the bug. */}
           <svg viewBox="0 0 28 28" width="28" height="28" className="hammer-impact absolute left-0 top-0 text-accent">
             <path d="M2 14h4M22 14h4M5 5l3 3M23 5l-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
