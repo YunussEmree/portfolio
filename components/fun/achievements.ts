@@ -9,6 +9,8 @@ export const OPEN_ARCADE = "fun:open-arcade";
 export const HINT_EVENT = "fun:hint";
 export const THEME_EVENT = "fun:theme";
 export const GLOBAL_BUGS_EVENT = "fun:global-bugs";
+/** Brings the screen bug in right away (DELETE /bugs in the API console). */
+export const SUMMON_BUG = "fun:summon-bug";
 
 const KEY = "achievements";
 const BUGS_KEY = "bugs-fixed";

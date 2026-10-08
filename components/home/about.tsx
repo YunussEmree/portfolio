@@ -1,6 +1,7 @@
 import { Award, GraduationCap, Languages } from "lucide-react";
 import { ABOUT, EDUCATION, LANGUAGES, RECOGNITION } from "@/data/profile";
 import { skillGroups } from "@/data/skills";
+import ApiConsole from "../fun/api-console";
 import Reveal from "../reveal";
 import SectionHeading from "../section-heading";
 
@@ -89,6 +90,10 @@ export default function About() {
               </div>
             ))}
           </div>
+        </Reveal>
+
+        <Reveal className="mt-16">
+          <ApiConsole />
         </Reveal>
       </div>
     </section>

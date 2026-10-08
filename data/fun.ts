@@ -21,7 +21,9 @@ export type AchievementId =
   | "duelist"
   | "collector"
   | "bulb"
-  | "airdefense";
+  | "airdefense"
+  | "teapot"
+  | "shipit";
 
 export const ACHIEVEMENTS: { id: AchievementId; title: string; detail: string; hint: string }[] = [
   { id: "logo", title: "Persistent", detail: "Clicked the logo five times in a row.", hint: "Logos like attention. Lots of it, quickly." },
@@ -44,6 +46,8 @@ export const ACHIEVEMENTS: { id: AchievementId; title: string; detail: string; h
   { id: "duelist", title: "Duelist", detail: "Beat the bot in the KPSS Düello demo.", hint: "One of the project cards has a sword on it. Win the duel." },
   { id: "bulb", title: "Power surge", detail: "Blew the bulb by switching the theme three times in a row. Somebody had to come and replace it.", hint: "The theme switch is a light bulb. Light bulbs don't like being flicked in a hurry." },
   { id: "airdefense", title: "Air defense", detail: "Cleared a whole wave of targets with the ENGEREK turret.", hint: "One project defends the skies. Fire its turret and leave nothing standing." },
+  { id: "teapot", title: "I'm a teapot", detail: "Asked my API for coffee and got a 418.", hint: "My API serves many things. Coffee is not one of them." },
+  { id: "shipit", title: "Shipped it", detail: "Deployed the EngerekTech platform from push to production.", hint: "One project card ships to production in a single click." },
   { id: "collector", title: "Word collector", detail: "Emptied the review jar in the Kelime Kavanozu demo.", hint: "One of the project cards has a jar on it. Empty it." },
 ];
 

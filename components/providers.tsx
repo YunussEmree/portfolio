@@ -2,7 +2,6 @@
 
 import Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import { THEME_EVENT } from "./fun/achievements";
 
 type Theme = "dark" | "light";
@@ -16,7 +15,8 @@ const ThemeContext = createContext<{ theme: Theme; toggle: (origin?: Point) => b
 
 export const useTheme = () => useContext(ThemeContext);
 
-type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void> };
+// Page backgrounds of each theme (--bg in app/globals.css), for the wipe that covers the switch.
+const BG: Record<Theme, string> = { dark: "#09090b", light: "#f6f6f3" };
 
 /** Theme state (the class on <html> is the source of truth) and smooth scrolling. */
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -26,17 +26,22 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   }, []);
 
-  // Cooldown: true while a switch animates, and nothing else switches meanwhile. Quick clicks used to stack view
-  // transitions (each one snapshots the whole page), which crashed Chromium-based browsers.
+  // Cooldown: true while a switch animates; clicks meanwhile do nothing.
   const busy = useRef(false);
 
-  /** Switches the theme in one step; with View Transitions the new theme grows as a circle from `origin`. */
+  /**
+   * Switches the theme. A circle of the new background grows from `origin` over the page, the theme flips
+   * underneath it, and the circle fades away. This used to be a View Transition, but those snapshot the whole page
+   * on the GPU and repeated switching crashed Chromium-based browsers; one animated element is cheap everywhere.
+   */
   const toggle = useCallback((origin?: Point) => {
     if (busy.current) return false;
     const root = document.documentElement;
     const next: Theme = root.classList.contains("dark") ? "light" : "dark";
     window.dispatchEvent(new Event(THEME_EVENT));
     const apply = () => {
+      // Elements with their own color transitions would otherwise change at different speeds.
+      root.classList.add("theme-switching");
       root.classList.toggle("dark", next === "dark");
       setTheme(next);
       try {
@@ -44,43 +49,52 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       } catch {
         /* private mode: the choice lasts for this visit */
       }
+      requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("theme-switching")));
     };
 
-    // Elements with their own color transitions would otherwise change at different speeds.
-    root.classList.add("theme-switching");
-    const done = () => requestAnimationFrame(() => root.classList.remove("theme-switching"));
-
-    const doc = document as Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
-    if (!doc.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("animate" in HTMLElement.prototype)) {
       apply();
-      done();
       return true;
     }
 
+    busy.current = true;
     const x = origin?.x ?? window.innerWidth / 2;
     const y = origin?.y ?? window.innerHeight / 2;
-    // The snapshot can be larger than innerWidth × innerHeight (scrollbars, mobile toolbars), so the circle ends well
-    // past the farthest corner; ending exactly on it left that corner (bottom left, from the nav) on the old theme.
-    const w = Math.max(window.innerWidth, document.documentElement.clientWidth);
-    const h = Math.max(window.innerHeight, document.documentElement.clientHeight, window.visualViewport?.height ?? 0);
-    const radius = Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) * 1.15 + 80;
-    busy.current = true;
-    // Never stuck: the cooldown ends with the transition, or after a second whatever happens.
-    const release = window.setTimeout(() => (busy.current = false), 1000);
-    const transition = doc.startViewTransition(() => flushSync(apply));
-    transition.ready
-      .then(() => {
-        root.animate(
-          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-          { duration: 480, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards", pseudoElement: "::view-transition-new(root)" },
-        );
-      })
-      .catch(() => {});
-    transition.finished.finally(() => {
-      window.clearTimeout(release);
+    const w = Math.max(window.innerWidth, root.clientWidth);
+    const h = Math.max(window.innerHeight, root.clientHeight, window.visualViewport?.height ?? 0);
+    const radius = Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) + 40;
+
+    const cover = document.createElement("div");
+    cover.setAttribute("aria-hidden", "true");
+    Object.assign(cover.style, { position: "fixed", inset: "0", zIndex: "2147483000", pointerEvents: "none", background: BG[next] });
+    document.body.appendChild(cover);
+    const finish = () => {
+      cover.remove();
       busy.current = false;
-      done();
-    });
+    };
+    // Never stuck: whatever happens, the cover goes and the cooldown ends.
+    let applied = false;
+    const applyOnce = () => {
+      if (applied) return;
+      applied = true;
+      apply();
+    };
+    const failsafe = window.setTimeout(() => {
+      applyOnce();
+      finish();
+    }, 1500);
+
+    cover
+      .animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] }, { duration: 380, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" })
+      .finished.then(() => {
+        applyOnce();
+        return cover.animate({ opacity: [1, 0] }, { duration: 280, easing: "ease-out", fill: "forwards" }).finished;
+      })
+      .catch(() => applyOnce())
+      .finally(() => {
+        window.clearTimeout(failsafe);
+        finish();
+      });
     return true;
   }, []);
 

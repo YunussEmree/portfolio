@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FUN } from "@/data/fun";
-import { fixBug } from "./achievements";
+import { fixBug, SUMMON_BUG } from "./achievements";
 import { BugIcon, HammerIcon } from "./icons";
 
 type Point = { x: number; y: number };
@@ -37,7 +37,16 @@ export default function ScreenBug() {
 
   useEffect(() => {
     scheduleVisit(FIRST_VISIT);
-    return () => window.clearTimeout(visitTimer.current);
+    // Summoned: come now, unless one is already on screen.
+    const summon = () => {
+      window.clearTimeout(visitTimer.current);
+      setActive(true);
+    };
+    window.addEventListener(SUMMON_BUG, summon);
+    return () => {
+      window.clearTimeout(visitTimer.current);
+      window.removeEventListener(SUMMON_BUG, summon);
+    };
   }, []);
 
   useEffect(() => {

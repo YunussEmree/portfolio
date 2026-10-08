@@ -59,7 +59,7 @@ export type Project = {
   links: Link[];
   icon?: string;
   /** A playable demo opened from the project card (components/demos). */
-  demo?: "kpss" | "kelime" | "engerek";
+  demo?: "kpss" | "kelime" | "engerek" | "deploy";
   /** Background of the screenshot panel, taken from the product's own colors. */
   tint: { from: string; to: string };
   /** "phone" shows portrait screenshots, "browser" a desktop screenshot. */

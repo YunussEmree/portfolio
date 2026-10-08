@@ -208,7 +208,7 @@ export default function BulbToggle() {
     unlock("bulb");
     window.setTimeout(() => {
       if (!document.documentElement.classList.contains("dark")) toggle(origin);
-    }, 650);
+    }, 800);
     window.setTimeout(() => setPhase("broken"), 800);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       window.setTimeout(() => {

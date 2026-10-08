@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { projects, sideProjects } from "@/data/projects";
 import DemoCallout from "../demos/demo-callout";
+import DeployCallout from "../demos/deploy-callout";
 import TurretCallout from "../demos/turret-callout";
 import { ProjectVisual } from "../media";
 import Reveal from "../reveal";
@@ -40,7 +41,7 @@ function FeaturedProject({ index }: { index: number }) {
           <Link href={`/work/${p.slug}`} className="block" aria-label={`${p.title} case study`} tabIndex={-1}>
             <ProjectVisual project={p} priority={index === 0} />
           </Link>
-          {p.demo === "engerek" ? <TurretCallout /> : p.demo && <DemoCallout demo={p.demo} />}
+          {p.demo === "engerek" ? <TurretCallout /> : p.demo === "deploy" ? <DeployCallout /> : p.demo && <DemoCallout demo={p.demo} />}
         </div>
 
         <div className={`lg:col-span-5 ${flip ? "lg:order-1" : ""}`}>

@@ -95,6 +95,7 @@ export const projects: Project[] = [
     stack: ["Angular SSR", "Spring Boot", "Java 25", "PostgreSQL", "Docker", "GitHub Actions", "nginx", "Claude API"],
     links: [{ label: "engerektech.com", href: "https://engerektech.com/en" }],
     icon: "/logos/engerektech.svg",
+    demo: "deploy",
     tint: { from: "#3569d9", to: "#1a2a55" },
     shotKind: "browser",
     shots: [

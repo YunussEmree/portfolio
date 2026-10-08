@@ -86,3 +86,23 @@ export const TURRET = {
   down: "✓",
   cleared: "Wave cleared!",
 };
+
+/**
+ * "Ship it!" on the EngerekTech platform card (components/demos/deploy-callout.tsx): the real pipeline from the case
+ * study, sped up. `fail` marks the stage where a flaky test sometimes fails and is re-run.
+ */
+export const DEPLOY = {
+  label: "Ship it!",
+  button: "Deploy the EngerekTech platform",
+  title: "Build & deploy · main",
+  spedUp: "sped up",
+  done: "Deployed in",
+  stages: [
+    { id: "push", label: "push", log: "$ git push origin main" },
+    { id: "build", label: "build", log: "▸ GitHub Actions: build Angular SSR + Spring Boot images", fail: "✗ 1 test failed: BlogTranslationTest (flaky)", retry: "↻ re-running failed jobs…" },
+    { id: "image", label: "GHCR", log: "✓ images pushed to ghcr.io" },
+    { id: "deploy", label: "server", log: "▸ ssh deploy@server · docker compose pull && up -d" },
+    { id: "migrate", label: "Flyway", log: "✓ database migrated on start" },
+    { id: "live", label: "live", log: "🚀 live at engerektech.com · nginx + TLS" },
+  ],
+};
