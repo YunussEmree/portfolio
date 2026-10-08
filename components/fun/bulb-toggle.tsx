@@ -197,18 +197,18 @@ export default function BulbToggle() {
   const press = (r: DOMRect) => {
     if (phase !== "ok") return; // a blown bulb waits for the janitor
     const origin = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    if (!toggle(origin)) return; // still animating the last switch: the click is ignored
+    toggle(origin);
     const now = Date.now();
     switches.current = [...switches.current.filter((t) => now - t < 3500), now];
     if (switches.current.length < 3) return;
 
-    // Three switches in a hurry: the bulb blows, and once the switch has finished the lights go out.
+    // Three switches in a hurry: the bulb blows and, a moment later, the lights go out.
     switches.current = [];
     setPhase("exploding");
     unlock("bulb");
     window.setTimeout(() => {
       if (!document.documentElement.classList.contains("dark")) toggle(origin);
-    }, 800);
+    }, 350);
     window.setTimeout(() => setPhase("broken"), 800);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       window.setTimeout(() => {
