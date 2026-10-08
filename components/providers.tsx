@@ -15,6 +15,8 @@ const ThemeContext = createContext<{ theme: Theme; toggle: (origin?: Point) => v
 
 export const useTheme = () => useContext(ThemeContext);
 
+type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void>; skipTransition: () => void };
+
 /** Theme state (the class on <html> is the source of truth) and smooth scrolling. */
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
@@ -26,6 +28,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   }, []);
 
+  // The view transition in flight, if any. Only one may run at a time: each one snapshots the whole page, and
+  // starting a new one on every quick click crashed Chromium-based browsers.
+  const running = useRef<ViewTransitionLike | null>(null);
+
   /** Switches the theme in one step; with View Transitions the new theme grows as a circle from `origin`. */
   const toggle = useCallback((origin?: Point) => {
     const root = document.documentElement;
@@ -33,11 +39,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     const next: Theme = now === "dark" ? "light" : "dark";
     intended.current = next;
     window.dispatchEvent(new Event(THEME_EVENT));
+    // Always applies the latest wish, so it does not matter in which order a skipped and a new switch land.
     const apply = () => {
-      root.classList.toggle("dark", next === "dark");
-      setTheme(next);
+      const want = intended.current ?? next;
+      root.classList.toggle("dark", want === "dark");
+      setTheme(want);
       try {
-        localStorage.setItem("theme", next);
+        localStorage.setItem("theme", want);
       } catch {
         /* private mode: the choice lasts for this visit */
       }
@@ -47,10 +55,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     root.classList.add("theme-switching");
     const done = () => requestAnimationFrame(() => root.classList.remove("theme-switching"));
 
-    const doc = document as Document & {
-      startViewTransition?: (update: () => void) => { ready: Promise<void>; finished: Promise<void> };
-    };
-    if (!doc.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const doc = document as Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
+    // A click while the circle is still growing switches instantly instead of stacking another transition.
+    if (!doc.startViewTransition || running.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      running.current?.skipTransition();
       apply();
       done();
       return;
@@ -64,6 +72,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     const h = Math.max(window.innerHeight, document.documentElement.clientHeight, window.visualViewport?.height ?? 0);
     const radius = Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) * 1.15 + 80;
     const transition = doc.startViewTransition(() => flushSync(apply));
+    running.current = transition;
     transition.ready
       .then(() => {
         root.animate(
@@ -72,7 +81,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         );
       })
       .catch(() => {});
-    transition.finished.finally(done);
+    transition.finished.finally(() => {
+      if (running.current === transition) running.current = null;
+      done();
+    });
   }, []);
 
   useEffect(() => {
