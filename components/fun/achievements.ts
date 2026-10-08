@@ -8,6 +8,7 @@ export const BUGS_EVENT = "fun:bugs";
 export const OPEN_ARCADE = "fun:open-arcade";
 export const HINT_EVENT = "fun:hint";
 export const THEME_EVENT = "fun:theme";
+export const GLOBAL_BUGS_EVENT = "fun:global-bugs";
 
 const KEY = "achievements";
 const BUGS_KEY = "bugs-fixed";
@@ -57,12 +58,50 @@ export function fixBug(): number {
   }
   window.dispatchEvent(new Event(BUGS_EVENT));
   unlock("bugs");
+  reportBug();
   return next;
 }
 
-/** Opens the arcade dialog, on the picker or straight into `game`. */
-export function openArcade(game?: GameId) {
-  window.dispatchEvent(new CustomEvent(OPEN_ARCADE, { detail: { game: game ?? null } }));
+/* The shared counter (app/api/bugs): every visitor's squashed bugs added up. null until known or when unavailable. */
+let globalBugs: number | null = null;
+const announce = (total: number | null) => {
+  globalBugs = total;
+  window.dispatchEvent(new CustomEvent(GLOBAL_BUGS_EVENT, { detail: total }));
+};
+
+async function reportBug() {
+  if (globalBugs !== null) announce(globalBugs + 1); // show it at once, then take the server's number
+  try {
+    const res = await fetch("/api/bugs", { method: "POST" });
+    const { total } = (await res.json()) as { total: number | null };
+    if (typeof total === "number") announce(Math.max(total, globalBugs ?? 0));
+  } catch {
+    /* offline: keep the optimistic number */
+  }
+}
+
+/** The shared total, or null when the counter is not available (then show the visitor's own count). */
+export function useGlobalBugs() {
+  const [total, setTotal] = useState<number | null>(globalBugs);
+  useEffect(() => {
+    const on = (e: Event) => setTotal((e as CustomEvent<number | null>).detail);
+    window.addEventListener(GLOBAL_BUGS_EVENT, on);
+    if (globalBugs === null)
+      fetch("/api/bugs")
+        .then((r) => r.json())
+        .then(({ total: t }: { total: number | null }) => typeof t === "number" && announce(t))
+        .catch(() => {});
+    return () => window.removeEventListener(GLOBAL_BUGS_EVENT, on);
+  }, []);
+  return total;
+}
+
+/** What the arcade dialog shows: a game, the trophy case, or (null) the picker. */
+export type ArcadeView = GameId | "trophies";
+
+/** Opens the arcade dialog, on the picker or straight into a game or the trophy case. */
+export function openArcade(view?: ArcadeView) {
+  window.dispatchEvent(new CustomEvent(OPEN_ARCADE, { detail: { view: view ?? null } }));
 }
 
 /** Live counts for the footer: bugs fixed and secrets found. */

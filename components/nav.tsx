@@ -1,14 +1,14 @@
 "use client";
 
-import { Command, Menu, Moon, Sun, X } from "lucide-react";
+import { Command, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { PROFILE } from "@/data/profile";
 import { OPEN_COMMAND_MENU } from "./command-menu";
+import BulbToggle from "./fun/bulb-toggle";
 import { unlock } from "./fun/achievements";
 import { confetti } from "./fun/effects";
-import { useTheme } from "./providers";
 
 export const NAV_ITEMS = [
   { label: "Work", id: "work" },
@@ -16,32 +16,6 @@ export const NAV_ITEMS = [
   { label: "About", id: "about" },
   { label: "Contact", id: "contact" },
 ];
-
-export function ThemeToggle() {
-  const { theme, toggle } = useTheme();
-  // Bumped on every click so only a real toggle (not the first render) spins the new icon in.
-  const [swaps, setSwaps] = useState(0);
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        setSwaps((n) => n + 1);
-        toggle({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
-      }}
-      className="group grid size-9 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg"
-      aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-    >
-      <span key={swaps} className={swaps ? "icon-swap" : undefined}>
-        {theme === "dark" ? (
-          <Sun className="size-4 transition-transform duration-500 ease-out group-hover:rotate-90" />
-        ) : (
-          <Moon className="size-4 transition-transform duration-500 ease-out group-hover:-rotate-12" />
-        )}
-      </span>
-    </button>
-  );
-}
 
 export default function Nav() {
   const pathname = usePathname();
@@ -145,7 +119,7 @@ export default function Nav() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-1">
+        <div className="relative flex items-center gap-1">
           <button
             type="button"
             onClick={() => window.dispatchEvent(new Event(OPEN_COMMAND_MENU))}
@@ -155,17 +129,19 @@ export default function Nav() {
             <Command className="size-3.5" />
             <span className="font-mono">K</span>
           </button>
-          <ThemeToggle />
+          <BulbToggle />
           <a
             href={PROFILE.cv}
-            className="ml-1 hidden h-9 items-center rounded-full bg-fg px-4 text-sm font-medium text-bg transition hover:opacity-85 sm:flex"
+            data-janitor-cover=""
+            className="relative z-20 ml-1 hidden h-9 items-center rounded-full bg-fg px-4 text-sm font-medium text-bg transition hover:opacity-85 sm:flex"
           >
             Résumé
           </a>
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="grid size-9 place-items-center rounded-full text-fg md:hidden"
+            data-janitor-cover=""
+            className="relative z-20 grid size-9 place-items-center rounded-full text-fg md:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}

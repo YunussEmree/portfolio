@@ -6,6 +6,7 @@ import { FUN, GAMES } from "@/data/fun";
 import { unlock } from "./achievements";
 import { confetti } from "./effects";
 import { readBest, saveBest } from "./scores";
+import { NewBest, Stats } from "./ui";
 
 type P = { x: number; y: number };
 type Phase = "ready" | "playing" | "paused" | "over";
@@ -35,6 +36,10 @@ const fresh = () => ({
   queue: [] as P[],
   food: { x: 12, y: 9 },
   score: 0,
+  // A golden "hotfix" that is worth 3 and expires.
+  bonus: null as (P & { until: number }) | null,
+  pops: [] as (P & { text: string; at: number })[],
+  charmed: false,
 });
 
 /** Packet Snake: the snake eats API requests and gets faster. Rendered inside the arcade dialog. */
@@ -45,20 +50,26 @@ export default function Snake() {
   const [phase, setPhaseState] = useState<Phase>("ready");
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
+  const [isBest, setIsBest] = useState(false);
+  const prevBest = useRef(0);
 
   const setPhase = (p: Phase) => {
     phaseRef.current = p;
     setPhaseState(p);
   };
 
-  useEffect(() => setBest(readBest(META.bestKey) ?? 0), []);
+  useEffect(() => {
+    const b = readBest(META.bestKey) ?? 0;
+    setBest(b);
+    prevBest.current = b;
+  }, []);
 
-  const placeFood = () => {
+  const freeCell = (): P => {
     const g = game.current;
     let f: P;
     do f = { x: Math.floor(Math.random() * N), y: Math.floor(Math.random() * N) };
-    while (g.snake.some((s) => s.x === f.x && s.y === f.y));
-    g.food = f;
+    while (g.snake.some((s) => s.x === f.x && s.y === f.y) || (g.food.x === f.x && g.food.y === f.y) || (g.bonus?.x === f.x && g.bonus?.y === f.y));
+    return f;
   };
 
   const steer = useCallback((d: P) => {
@@ -74,6 +85,8 @@ export default function Snake() {
     if (p === "over") {
       game.current = fresh();
       setScore(0);
+      setIsBest(false);
+      prevBest.current = readBest(META.bestKey) ?? 0;
       setPhase("playing");
     } else setPhase(p === "playing" ? "paused" : "playing");
   }, []);
@@ -92,7 +105,7 @@ export default function Snake() {
     let acc = 0;
     let last = performance.now();
 
-    const step = () => {
+    const step = (now: number) => {
       const g = game.current;
       g.dir = g.queue.shift() ?? g.dir;
       const head = { x: g.snake[0].x + g.dir.x, y: g.snake[0].y + g.dir.y };
@@ -101,14 +114,24 @@ export default function Snake() {
       if (hitWall || hitSelf) {
         setPhase("over");
         setBest(saveBest(META.bestKey, g.score));
+        setIsBest(g.score > prevBest.current);
         return;
       }
       g.snake.unshift(head);
-      if (head.x === g.food.x && head.y === g.food.y) {
-        g.score += 1;
+      if (g.bonus && g.bonus.until <= now) g.bonus = null;
+      const ateFood = head.x === g.food.x && head.y === g.food.y;
+      const ateBonus = !!g.bonus && head.x === g.bonus.x && head.y === g.bonus.y;
+      if (ateFood || ateBonus) {
+        const gain = ateBonus ? 3 : 1;
+        g.score += gain;
+        g.pops.push({ ...head, text: `+${gain}`, at: now });
         setScore(g.score);
-        placeFood();
-        if (g.score === 10) {
+        if (ateFood) {
+          g.food = freeCell();
+          if (!g.bonus && g.score >= 3 && Math.random() < 0.25) g.bonus = { ...freeCell(), until: now + 6000 };
+        } else g.bonus = null;
+        if (g.score >= 10 && !g.charmed) {
+          g.charmed = true;
           unlock("snake");
           const r = c.getBoundingClientRect();
           confetti({ x: r.left + r.width / 2, y: r.top + r.height / 2, count: 70 });
@@ -134,6 +157,23 @@ export default function Snake() {
       ctx.roundRect(g.food.x * CELL + (CELL - fs) / 2, g.food.y * CELL + (CELL - fs) / 2, fs, fs, 4);
       ctx.fill();
 
+      // Hotfix: golden, spinning, blinking in its last 1.5 seconds.
+      if (g.bonus && (g.bonus.until - now > 1500 || Math.floor(now / 120) % 2 === 0)) {
+        ctx.save();
+        ctx.translate(g.bonus.x * CELL + CELL / 2, g.bonus.y * CELL + CELL / 2);
+        ctx.rotate(now / 400);
+        ctx.fillStyle = "#ffb547";
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const r = i % 2 ? 3.2 : 7.5;
+          const a = (i / 10) * Math.PI * 2;
+          ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
       g.snake.forEach((s, i) => {
         ctx.globalAlpha = i === 0 ? 1 : Math.max(0.35, 1 - i / (g.snake.length + 4));
         ctx.fillStyle = i === 0 ? v("--accent-fill") : v("--fg");
@@ -149,6 +189,18 @@ export default function Snake() {
       const ey = h.y * CELL + CELL / 2 + g.dir.y * 3;
       ctx.fillRect(ex - 1.5 + g.dir.y * 3, ey - 1.5 + g.dir.x * 3, 3, 3);
       ctx.fillRect(ex - 1.5 - g.dir.y * 3, ey - 1.5 - g.dir.x * 3, 3, 3);
+
+      // "+1" / "+3" float up from where something was eaten.
+      g.pops = g.pops.filter((p) => now - p.at < 700);
+      ctx.font = "700 11px ui-monospace, monospace";
+      ctx.textAlign = "center";
+      g.pops.forEach((p) => {
+        const t = (now - p.at) / 700;
+        ctx.globalAlpha = 1 - t;
+        ctx.fillStyle = p.text === "+3" ? "#ffb547" : v("--accent");
+        ctx.fillText(p.text, p.x * CELL + CELL / 2, p.y * CELL - 2 - t * 16);
+      });
+      ctx.globalAlpha = 1;
     };
 
     const loop = (now: number) => {
@@ -160,7 +212,7 @@ export default function Snake() {
         const interval = Math.max(65, 140 - game.current.score * 4);
         while (acc >= interval && phaseRef.current === "playing") {
           acc -= interval;
-          step();
+          step(now);
         }
       } else acc = 0;
       draw(now);
@@ -214,16 +266,14 @@ export default function Snake() {
 
   return (
     <div>
-      <div className="flex items-center justify-between font-mono text-xs text-muted" aria-live="polite">
-        <span>
-          {FUN.score} <span className="text-fg tabular-nums">{score}</span>
-        </span>
-        <span>
-          {FUN.best} <span className="text-fg tabular-nums">{Math.max(best, score)}</span>
-        </span>
-      </div>
+      <Stats
+        items={[
+          { label: FUN.score, value: score },
+          { label: FUN.best, value: Math.max(best, score) },
+        ]}
+      />
 
-      <div className="relative mt-2 overflow-hidden rounded-xl border border-line">
+      <div className={`relative mt-2 overflow-hidden rounded-xl border border-line ${phase === "over" ? "shake" : ""}`}>
         <canvas
           ref={canvas}
           className="block aspect-square w-full touch-none select-none"
@@ -234,8 +284,9 @@ export default function Snake() {
         {overlay && (
           <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-surface/85 px-4 py-3 text-center text-sm font-medium text-fg backdrop-blur">
             {phase === "over" && (
-              <span className="block font-mono text-xs text-muted">
+              <span className="mb-1 flex items-center justify-center gap-2 font-mono text-xs text-muted">
                 {FUN.score} {score}
+                {isBest && <NewBest />}
               </span>
             )}
             {overlay}

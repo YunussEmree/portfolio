@@ -3,10 +3,11 @@
 import { Lightbulb, Terminal, Trophy } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { ACHIEVEMENTS, FUN, type GameId } from "@/data/fun";
+import { ACHIEVEMENTS, FUN } from "@/data/fun";
 import { PROFILE } from "@/data/profile";
-import { ACHIEVEMENT_EVENT, HINT_EVENT, OPEN_ARCADE, THEME_EVENT, unlock, unlockedAchievements } from "./achievements";
+import { ACHIEVEMENT_EVENT, type ArcadeView, HINT_EVENT, OPEN_ARCADE, THEME_EVENT, unlock, unlockedAchievements } from "./achievements";
 import { barrelRoll, confetti, emojiRain } from "./effects";
+import FunDock from "./fun-dock";
 import ScreenBug from "./screen-bug";
 
 // The arcade and its games only download when someone opens it.
@@ -25,8 +26,8 @@ const ICONS = { achievement: Trophy, complete: Trophy, hint: Lightbulb, terminal
  */
 export default function FunLayer() {
   const [toast, setToast] = useState<Toast | null>(null);
-  // undefined: closed; null: the game picker; otherwise the game being played.
-  const [arcade, setArcade] = useState<GameId | null | undefined>(undefined);
+  // undefined: closed; null: the game picker; otherwise a game or the trophy case.
+  const [arcade, setArcade] = useState<ArcadeView | null | undefined>(undefined);
   const arcadeOpen = useRef(false);
   arcadeOpen.current = arcade !== undefined;
   const timer = useRef(0);
@@ -94,12 +95,30 @@ export default function FunLayer() {
         emojiRain("☕");
       }
     };
-    const onOpen = (e: Event) => setArcade((e as CustomEvent<{ game: GameId | null }>).detail?.game ?? null);
+    const onOpen = (e: Event) => setArcade((e as CustomEvent<{ view: ArcadeView | null }>).detail?.view ?? null);
     window.addEventListener("keydown", onKey);
     window.addEventListener(OPEN_ARCADE, onOpen);
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener(OPEN_ARCADE, onOpen);
+    };
+  }, []);
+
+  // Quiet secrets: reading to the very end, copying from the page, visiting after midnight.
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80) unlock("thorough");
+    };
+    const onCopy = () => {
+      if (String(window.getSelection() ?? "").trim()) unlock("copycat");
+    };
+    const night = new Date().getHours() < 5 ? window.setTimeout(() => unlock("nightowl"), 4000) : 0;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("copy", onCopy);
+    return () => {
+      window.clearTimeout(night);
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("copy", onCopy);
     };
   }, []);
 
@@ -155,6 +174,7 @@ export default function FunLayer() {
 
   return (
     <>
+      <FunDock />
       <ScreenBug />
       {arcade !== undefined && <Arcade initial={arcade} onClose={() => setArcade(undefined)} />}
       <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-6 right-4 z-[120] sm:right-6">

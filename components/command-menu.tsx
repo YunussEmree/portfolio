@@ -8,6 +8,7 @@ import {
   FolderGit2,
   Gamepad2,
   Lightbulb,
+  Trophy,
   Mail,
   RotateCw,
   Search,
@@ -157,6 +158,17 @@ export default function CommandMenu() {
           openArcade(g.id);
         },
       })),
+      {
+        id: "trophies",
+        group: "Fun",
+        label: FUN.trophies.title,
+        hint: "hidden achievements",
+        icon: <Trophy />,
+        run: () => {
+          close();
+          openArcade("trophies");
+        },
+      },
       {
         id: "hint",
         group: "Fun",

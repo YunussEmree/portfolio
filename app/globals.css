@@ -409,6 +409,260 @@ html.lenis body {
   animation: score-pop 0.6s ease-out 0.2s both;
 }
 
+/* Demo callouts on the app cards (components/demos/demo-callout.tsx). */
+@keyframes callout-bob {
+  50% {
+    transform: translate(-3px, -4px) rotate(-2deg);
+  }
+}
+.callout-bob {
+  animation: callout-bob 2.4s ease-in-out infinite;
+}
+.callout-draw {
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+  animation: callout-draw 0.9s ease-out 0.4s forwards;
+}
+.callout-draw-late {
+  animation-delay: 1.2s;
+}
+@keyframes callout-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes callout-ticks {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(0.88);
+    opacity: 1;
+  }
+}
+.callout-ticks {
+  animation: callout-ticks 1.2s ease-in-out infinite;
+}
+@keyframes jar-drop {
+  from {
+    transform: translateY(-34px);
+    opacity: 0;
+  }
+  70% {
+    transform: translateY(2px);
+    opacity: 1;
+  }
+}
+.jar-drop {
+  animation: jar-drop 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* The bulb theme switch (components/fun/bulb-toggle.tsx). */
+.bulb-glow {
+  filter: drop-shadow(0 0 5px rgb(255 196 0 / 0.55));
+}
+@keyframes bulb-rays {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.bulb-rays {
+  transform-origin: 12px 9px;
+  animation: bulb-rays 0.35s ease-out both;
+}
+@keyframes bulb-screw {
+  0% {
+    transform: translateY(-6px) rotate(-30deg);
+    opacity: 0;
+  }
+  40% {
+    transform: translateY(-2px) rotate(20deg);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(0) rotate(-10deg);
+  }
+}
+.bulb-screw {
+  transform-origin: 12px 17px;
+  animation: bulb-screw 0.7s ease-out;
+}
+@keyframes bulb-flash {
+  from {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(2.6);
+    opacity: 0;
+  }
+}
+.bulb-flash {
+  animation: bulb-flash 0.45s ease-out forwards;
+}
+@keyframes bulb-shard {
+  from {
+    transform: translate(-50%, 0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(calc(-50% + var(--dx)), calc(var(--dy) + 14px)) rotate(var(--r));
+    opacity: 0;
+  }
+}
+.bulb-shard {
+  animation: bulb-shard 0.75s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+@keyframes bulb-smoke {
+  from {
+    transform: translateY(0) scale(0.6);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(-22px) scale(2.2);
+    opacity: 0;
+  }
+}
+.bulb-smoke {
+  background: rgb(140 140 150 / 0.55);
+  animation: bulb-smoke 0.9s ease-out 0.15s both;
+}
+.bulb-smoke-late {
+  animation-delay: 0.3s;
+}
+
+@keyframes bulb-spark {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 2px) scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -6px) scale(1.2);
+  }
+}
+.bulb-spark {
+  animation: bulb-spark 0.35s ease-out forwards;
+}
+
+/* The janitor who replaces the bulb. */
+@keyframes janitor-shake {
+  25% {
+    transform: translateX(-1.5px) rotate(-4deg);
+  }
+  75% {
+    transform: translateX(1.5px) rotate(4deg);
+  }
+}
+.janitor-shake {
+  animation: janitor-shake 0.14s linear infinite;
+}
+.janitor-arm {
+  transform-origin: 19px 17px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes janitor-leg {
+  from {
+    transform: rotate(-16deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+.janitor-leg-l {
+  transform-origin: 9.6px 25px;
+}
+.janitor-leg-r {
+  transform-origin: 14.4px 25px;
+}
+.janitor-walk .janitor-leg-l {
+  animation: janitor-leg 0.22s ease-in-out infinite alternate;
+}
+.janitor-walk .janitor-leg-r {
+  animation: janitor-leg 0.22s ease-in-out infinite alternate-reverse;
+}
+@keyframes janitor-bounce {
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+.janitor-walk {
+  animation: janitor-bounce 0.22s ease-in-out infinite;
+}
+
+/* Arcade: shared feedback. */
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+.shake {
+  animation: shake 0.4s ease-in-out;
+}
+@keyframes wiggle {
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+.wiggle {
+  animation: wiggle 0.18s ease-in-out 2;
+}
+@keyframes best-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+  }
+}
+.best-pop {
+  animation: best-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Arcade: Merge Conflict tiles slide, merges pop, new tiles grow in. */
+.merge-tile {
+  transition: transform 0.12s ease-in-out;
+}
+@keyframes tile-merge {
+  50% {
+    transform: scale(1.18);
+  }
+}
+.tile-merge {
+  animation: tile-merge 0.22s ease-out 0.1s;
+}
+@keyframes tile-new {
+  from {
+    transform: scale(0);
+  }
+}
+.tile-new {
+  animation: tile-new 0.2s ease-out 0.12s both;
+}
+
+/* Arcade: Terminal Typer caret. */
+@keyframes caret {
+  50% {
+    box-shadow: inset 2px 0 0 transparent;
+  }
+}
+.typer-caret {
+  box-shadow: inset 2px 0 0 #c6f36a;
+  animation: caret 1s steps(1) infinite;
+}
+
 /* Arcade: Stack Match cards flip in 3D. */
 .flip-card {
   perspective: 600px;
@@ -545,7 +799,8 @@ html.lenis body {
     transform: none;
     transition: none;
   }
-  .flip-inner {
+  .flip-inner,
+  .merge-tile {
     transition: none;
   }
   /* No swing: just say it was debugged. */
@@ -586,6 +841,10 @@ html.lenis body {
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+/* The transition overlay must not swallow clicks, or the theme switch ignores you until the animation ends. */
+::view-transition {
+  pointer-events: none;
 }
 ::view-transition-new(root) {
   z-index: 1;

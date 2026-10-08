@@ -1,6 +1,8 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { projects, sideProjects } from "@/data/projects";
+import DemoCallout from "../demos/demo-callout";
+import TurretCallout from "../demos/turret-callout";
 import { ProjectVisual } from "../media";
 import Reveal from "../reveal";
 import SectionHeading from "../section-heading";
@@ -33,14 +35,13 @@ function FeaturedProject({ index }: { index: number }) {
   return (
     <Reveal>
       <article className="group grid items-center gap-8 lg:grid-cols-12 lg:gap-14" aria-labelledby={`p-${p.slug}`}>
-        <Link
-          href={`/work/${p.slug}`}
-          className={`block lg:col-span-7 ${flip ? "lg:order-2" : ""}`}
-          aria-label={`${p.title} case study`}
-          tabIndex={-1}
-        >
-          <ProjectVisual project={p} priority={index === 0} />
-        </Link>
+        {/* The demo button sits beside the link, not inside it (no buttons inside links). */}
+        <div className={`relative lg:col-span-7 ${flip ? "lg:order-2" : ""}`}>
+          <Link href={`/work/${p.slug}`} className="block" aria-label={`${p.title} case study`} tabIndex={-1}>
+            <ProjectVisual project={p} priority={index === 0} />
+          </Link>
+          {p.demo === "engerek" ? <TurretCallout /> : p.demo && <DemoCallout demo={p.demo} />}
+        </div>
 
         <div className={`lg:col-span-5 ${flip ? "lg:order-1" : ""}`}>
           <div className="flex flex-wrap items-center gap-3">
@@ -108,7 +109,7 @@ export default function Work() {
               Products I designed, built <span className="serif-accent text-muted">and</span> run.
             </>
           }
-          intro="Each one started as an idea and is now in people's hands, live or in testing on Google Play. I owned the backend, the clients and the path to production."
+          intro="Three products in people's hands, live or in testing on Google Play, where I owned the backend, the clients and the path to production; and the air-defense turret I captained for TEKNOFEST."
         />
 
         <div className="space-y-24 sm:space-y-32">

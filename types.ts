@@ -58,6 +58,8 @@ export type Project = {
   stack: string[];
   links: Link[];
   icon?: string;
+  /** A playable demo opened from the project card (components/demos). */
+  demo?: "kpss" | "kelime" | "engerek";
   /** Background of the screenshot panel, taken from the product's own colors. */
   tint: { from: string; to: string };
   /** "phone" shows portrait screenshots, "browser" a desktop screenshot. */

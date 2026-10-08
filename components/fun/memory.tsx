@@ -5,6 +5,7 @@ import { FUN, GAMES } from "@/data/fun";
 import { unlock } from "./achievements";
 import { confetti } from "./effects";
 import { readBest, saveBest } from "./scores";
+import { Panel, Stats } from "./ui";
 
 type Card = { id: number; label: string; color: string; matched: boolean };
 
@@ -39,6 +40,9 @@ export default function Memory() {
   const [elapsed, setElapsed] = useState(0);
   const [done, setDone] = useState(false);
   const [best, setBest] = useState<number | null>(null);
+  const [isBest, setIsBest] = useState(false);
+  const [wrong, setWrong] = useState<number[]>([]);
+  const prevBest = useRef<number | null>(null);
   const board = useRef<HTMLDivElement>(null);
 
   useEffect(() => setBest(readBest(META.bestKey)), []);
@@ -52,7 +56,10 @@ export default function Memory() {
 
   const flip = (i: number) => {
     if (done || open.length === 2 || cards[i].matched || open.includes(i)) return;
-    if (startedAt === null) setStartedAt(Date.now());
+    if (startedAt === null) {
+      setStartedAt(Date.now());
+      prevBest.current = readBest(META.bestKey);
+    }
     const next = [...open, i];
     setOpen(next);
     if (next.length < 2) return;
@@ -68,6 +75,7 @@ export default function Memory() {
         if (updated.every((c) => c.matched)) {
           setDone(true);
           setBest(saveBest(META.bestKey, made, true));
+          setIsBest(prevBest.current === null || made < prevBest.current);
           if (made <= 14) {
             unlock("memory");
             const r = board.current?.getBoundingClientRect();
@@ -75,7 +83,14 @@ export default function Memory() {
           }
         }
       }, 350);
-    } else window.setTimeout(() => setOpen([]), 850);
+    } else {
+      // A wrong pair shakes its head before turning back.
+      window.setTimeout(() => setWrong([a, b]), 420);
+      window.setTimeout(() => {
+        setOpen([]);
+        setWrong([]);
+      }, 900);
+    }
   };
 
   const restart = () => {
@@ -85,23 +100,21 @@ export default function Memory() {
     setStartedAt(null);
     setElapsed(0);
     setDone(false);
+    setIsBest(false);
+    setWrong([]);
   };
 
   const seconds = Math.floor(elapsed / 1000);
 
   return (
     <div>
-      <div className="flex items-center justify-between font-mono text-xs text-muted" aria-live="polite">
-        <span>
-          {FUN.memory.moves} <span className="text-fg tabular-nums">{moves}</span>
-        </span>
-        <span>
-          {FUN.time} <span className="text-fg tabular-nums">{seconds}s</span>
-        </span>
-        <span>
-          {FUN.best} <span className="text-fg tabular-nums">{best ?? "–"}</span>
-        </span>
-      </div>
+      <Stats
+        items={[
+          { label: FUN.memory.moves, value: moves },
+          { label: FUN.time, value: `${seconds}s` },
+          { label: FUN.best, value: best ?? "–" },
+        ]}
+      />
 
       <div ref={board} className="relative mt-3">
         <div className="grid grid-cols-4 gap-2">
@@ -113,7 +126,7 @@ export default function Memory() {
                 type="button"
                 onClick={() => flip(i)}
                 aria-label={faceUp ? c.label : FUN.memory.hidden}
-                className="flip-card aspect-square"
+                className={`flip-card aspect-square ${wrong.includes(i) ? "wiggle" : ""}`}
               >
                 <span className={`flip-inner ${faceUp ? "is-flipped" : ""} ${c.matched ? "is-matched" : ""}`}>
                   <span className="flip-face border border-line bg-surface-2 font-mono text-sm text-faint">{"</>"}</span>
@@ -133,21 +146,11 @@ export default function Memory() {
         </div>
 
         {done && (
-          <div className="fade-in absolute inset-0 grid place-items-center rounded-2xl bg-surface/80 p-6 text-center backdrop-blur-sm">
-            <div>
-              <p className="font-semibold text-fg">{FUN.memory.done}</p>
-              <p className="mt-1 font-mono text-sm text-muted">
-                {moves} {FUN.memory.moves.toLowerCase()} · {seconds}s · {FUN.best} {best}
-              </p>
-              <button
-                type="button"
-                onClick={restart}
-                className="mt-4 inline-flex h-10 items-center rounded-full bg-accent-fill px-5 text-sm font-medium text-accent-ink transition hover:brightness-105"
-              >
-                {FUN.memory.again}
-              </button>
-            </div>
-          </div>
+          <Panel title={FUN.memory.done} action={FUN.memory.again} onAction={restart} best={isBest}>
+            <span className="font-mono">
+              {moves} {FUN.memory.moves.toLowerCase()} · {seconds}s · {FUN.best} {best}
+            </span>
+          </Panel>
         )}
       </div>
       {!done && moves === 0 && <p className="mt-3 text-center text-sm text-muted">{FUN.memory.intro}</p>}

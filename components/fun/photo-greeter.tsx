@@ -4,14 +4,19 @@ import { useRef, useState } from "react";
 import { FUN } from "@/data/fun";
 import { unlock } from "./achievements";
 
-/** Wraps the portrait: every click pops a speech bubble saying hi in the next language. */
+/** Wraps the portrait: every click pops a speech bubble saying hi, first in the visitor's language, then the next one. */
 export default function PhotoGreeter({ className = "", children }: { className?: string; children: React.ReactNode }) {
   const [bubble, setBubble] = useState<{ text: string; key: number } | null>(null);
   const count = useRef(0);
+  const offset = useRef<number | null>(null);
   const timer = useRef(0);
 
   const greet = () => {
-    const text = FUN.greetings[count.current % FUN.greetings.length];
+    if (offset.current === null) {
+      const lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+      offset.current = Math.max(0, FUN.greetings.findIndex((g) => g.lang === lang));
+    }
+    const { text } = FUN.greetings[(offset.current + count.current) % FUN.greetings.length];
     count.current += 1;
     setBubble({ text, key: count.current });
     if (count.current >= 5) unlock("polyglot");

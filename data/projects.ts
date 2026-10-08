@@ -16,6 +16,7 @@ export const projects: Project[] = [
     stack: ["Flutter", "Dart", "Firebase Realtime DB", "Firestore", "Cloud Functions", "Node.js", "Pub/Sub", "GitHub Actions"],
     links: [{ label: "Watch the trailer", href: "https://youtube.com/shorts/g4NbPTDgWBs" }],
     icon: "/work/kpss-icon.webp",
+    demo: "kpss",
     tint: { from: "#3b2a8c", to: "#141a3d" },
     shotKind: "phone",
     shots: [
@@ -169,6 +170,7 @@ export const projects: Project[] = [
     stack: ["Flutter", "Dart", "Firebase Cloud Messaging", "Android"],
     links: [{ label: "Watch the trailer", href: "https://youtube.com/shorts/cnUsxQX81Jw" }],
     icon: "/work/kk-icon.webp",
+    demo: "kelime",
     tint: { from: "#27513f", to: "#0f1f18" },
     shotKind: "phone",
     shots: [
@@ -213,17 +215,74 @@ export const projects: Project[] = [
       lessons: ["Small, opinionated rules (three correct answers and it's out) are easier to trust than clever algorithms."],
     },
   },
+  {
+    slug: "engerek",
+    title: "ENGEREK",
+    tagline: "An autonomous air-defense turret for TEKNOFEST 2026",
+    summary:
+      "Our entry for TEKNOFEST 2026's Steel Dome air-defense competition: a pan-tilt turret with an airsoft gun that finds target models, tells them apart and engages them, by hand or on its own. As team captain I led 13 people across software, electronics and mechanics, and worked on the vision and targeting software myself.",
+    year: "2026",
+    role: "Team captain · vision and targeting software",
+    status: "TEKNOFEST 2026",
+    stack: ["Python", "YOLOv11", "ByteTrack", "OpenCV", "NVIDIA Jetson", "Teensy 4.1"],
+    links: [],
+    demo: "engerek",
+    tint: { from: "#1f3b4d", to: "#0b1720" },
+    shotKind: "browser",
+    shots: [
+      { src: "/work/engerek-ui.webp", alt: "ENGEREK operator station: camera view with numbered targets, mode, zones and fire control", width: 794, height: 406 },
+      { src: "/work/engerek-detect.webp", alt: "Simulation frame with YOLOv11 detections of helicopters, F-16s, missiles and drones", width: 472, height: 245 },
+    ],
+    highlights: [
+      "Two fixed cameras are merged into one panorama for detection; a third on the barrel confirms the aim.",
+      "A YOLOv11 model, trained on synthetic renders of the competition models, tells F-16s, helicopters, missiles and drones apart; ByteTrack follows them.",
+      "Manual, semi-automatic and automatic modes on one operator screen, with emergency stops, no-move and no-fire zones and friend protection.",
+    ],
+    caseStudy: {
+      context:
+        "TEKNOFEST's Steel Dome competition asks for a system that finds red enemy models among blue friendly ones, classifies each by type and pops the balloon under it with an airsoft shot, within 15 metres, both manually and autonomously. The order and the range windows depend on the target type, so classification decides most of the score.",
+      flowTitle: "From frame to shot",
+      flow: [
+        { label: "Cameras", detail: "two fixed cameras are undistorted and stitched into one panorama; the barrel camera watches the line of fire" },
+        { label: "YOLOv11 + ByteTrack", detail: "detect the target models, classify them by type and keep their tracks" },
+        { label: "Targeting", detail: "reads friend or foe from the model's colour, checks range and zones, and orders the targets" },
+        { label: "Teensy 4.1", detail: "drives the pan-tilt motors in a closed loop from the main computer's commands" },
+        { label: "Fire control", detail: "arms and fires only inside permitted zones; the emergency stop cuts both motion and fire" },
+      ],
+      sections: [
+        {
+          title: "What I did",
+          bullets: [
+            "Captained a 13-person team across software, electronics and mechanics through the preliminary and critical design reports.",
+            "Built the real-time detection and tracking pipeline and integrated it with the turret's embedded control.",
+          ],
+        },
+        {
+          title: "When synthetic data meets bright light",
+          paragraphs: [
+            "The detector was trained on synthetic images of the competition models. On the real turret it struggled in bright light, so we measured instead of guessing: live frames were far less saturated than anything in the training set, even its palest example.",
+            "The cause was an ordering bug in the renderer: scene lighting was applied to the background only and the models were drawn at full saturation on top, so the model learned \"saturated blob = target\". The same bug was quietly breaking the friend-or-foe colour check. Fixing the renderer fixed both.",
+          ],
+        },
+        {
+          title: "Safety first",
+          bullets: [
+            "Emergency stop in software and in hardware, for motion and for fire separately.",
+            "No-move and no-fire zones the turret cannot enter, and protection for friendly targets.",
+            "Three modes, so a person can always take over: manual, semi-automatic and automatic.",
+          ],
+        },
+      ],
+      lessons: [
+        "Measure before you guess: comparing live frames with the training set found the bright-light problem quickly.",
+        "Synthetic data is only as good as its lighting, and one bug can break more than one feature.",
+      ],
+    },
+  },
 ];
 
 /** Earlier, research and competition projects: a compact list under the flagship work. */
 export const sideProjects: SideProject[] = [
-  {
-    title: "ENGEREK",
-    context: "TEKNOFEST 2026 · Team Captain",
-    year: "2026",
-    desc: "Autonomous air-defense system: real-time target detection and tracking on NVIDIA Jetson, driving microcontroller actuation with millisecond-level response.",
-    stack: ["Python", "YOLO", "OpenCV", "NVIDIA Jetson"],
-  },
   {
     title: "Instagram content automation",
     context: "EngerekTech",
