@@ -7,12 +7,13 @@ export const contentType = "image/png";
 
 /** Only the glyphs the card uses, as TTF from Google Fonts (read at build time). */
 async function googleFont(family: string, text: string, variant = "wght@600") {
-  const css = await (
-    await fetch(`https://fonts.googleapis.com/css2?family=${family}:${variant}&text=${encodeURIComponent(text)}`)
-  ).text();
-  const url = css.match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/)?.[1];
+  const res = await fetch(`https://fonts.googleapis.com/css2?family=${family}:${variant}&text=${encodeURIComponent(text)}`);
+  if (!res.ok) throw new Error(`Google Fonts CSS ${res.status}`);
+  const url = (await res.text()).match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/)?.[1];
   if (!url) throw new Error(`No font file for ${family}`);
-  return (await fetch(url)).arrayBuffer();
+  const file = await fetch(url);
+  if (!file.ok) throw new Error(`Font file ${file.status}`);
+  return file.arrayBuffer();
 }
 
 const TAGS = ["Spring Boot", "NestJS", "Node", "Flutter", "Firebase", "Docker"];
@@ -104,6 +105,7 @@ export default async function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size, fonts },
+    // No `fonts` at all when none loaded: an empty list would switch off the built-in fallback font and fail the build.
+    { ...size, ...(fonts.length ? { fonts } : {}) },
   );
 }
