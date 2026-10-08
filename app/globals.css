@@ -534,20 +534,6 @@ html.lenis body {
   animation-delay: 0.3s;
 }
 
-@keyframes bulb-spark {
-  from {
-    opacity: 1;
-    transform: translate(-50%, 2px) scale(0.6);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -6px) scale(1.2);
-  }
-}
-.bulb-spark {
-  animation: bulb-spark 0.35s ease-out forwards;
-}
-
 /* The janitor who replaces the bulb. */
 @keyframes janitor-shake {
   25% {

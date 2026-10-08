@@ -8,44 +8,39 @@ import { THEME_EVENT } from "./fun/achievements";
 type Theme = "dark" | "light";
 type Point = { x: number; y: number };
 
-const ThemeContext = createContext<{ theme: Theme; toggle: (origin?: Point) => void }>({
+/** `toggle` returns false when it did nothing because the last switch is still animating (the cooldown). */
+const ThemeContext = createContext<{ theme: Theme; toggle: (origin?: Point) => boolean }>({
   theme: "dark",
-  toggle: () => {},
+  toggle: () => false,
 });
 
 export const useTheme = () => useContext(ThemeContext);
 
-type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void>; skipTransition: () => void };
+type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void> };
 
 /** Theme state (the class on <html> is the source of truth) and smooth scrolling. */
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
-  // The theme the last click asked for. A transition applies its change a frame later, so a quick second click
-  // must flip this, not the class that is still on <html>, or two clicks would ask for the same theme.
-  const intended = useRef<Theme | null>(null);
 
   useEffect(() => {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   }, []);
 
-  // The view transition in flight, if any. Only one may run at a time: each one snapshots the whole page, and
-  // starting a new one on every quick click crashed Chromium-based browsers.
-  const running = useRef<ViewTransitionLike | null>(null);
+  // Cooldown: true while a switch animates, and nothing else switches meanwhile. Quick clicks used to stack view
+  // transitions (each one snapshots the whole page), which crashed Chromium-based browsers.
+  const busy = useRef(false);
 
   /** Switches the theme in one step; with View Transitions the new theme grows as a circle from `origin`. */
   const toggle = useCallback((origin?: Point) => {
+    if (busy.current) return false;
     const root = document.documentElement;
-    const now: Theme = intended.current ?? (root.classList.contains("dark") ? "dark" : "light");
-    const next: Theme = now === "dark" ? "light" : "dark";
-    intended.current = next;
+    const next: Theme = root.classList.contains("dark") ? "light" : "dark";
     window.dispatchEvent(new Event(THEME_EVENT));
-    // Always applies the latest wish, so it does not matter in which order a skipped and a new switch land.
     const apply = () => {
-      const want = intended.current ?? next;
-      root.classList.toggle("dark", want === "dark");
-      setTheme(want);
+      root.classList.toggle("dark", next === "dark");
+      setTheme(next);
       try {
-        localStorage.setItem("theme", want);
+        localStorage.setItem("theme", next);
       } catch {
         /* private mode: the choice lasts for this visit */
       }
@@ -56,12 +51,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     const done = () => requestAnimationFrame(() => root.classList.remove("theme-switching"));
 
     const doc = document as Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
-    // A click while the circle is still growing switches instantly instead of stacking another transition.
-    if (!doc.startViewTransition || running.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      running.current?.skipTransition();
+    if (!doc.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       apply();
       done();
-      return;
+      return true;
     }
 
     const x = origin?.x ?? window.innerWidth / 2;
@@ -71,8 +64,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     const w = Math.max(window.innerWidth, document.documentElement.clientWidth);
     const h = Math.max(window.innerHeight, document.documentElement.clientHeight, window.visualViewport?.height ?? 0);
     const radius = Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) * 1.15 + 80;
+    busy.current = true;
+    // Never stuck: the cooldown ends with the transition, or after a second whatever happens.
+    const release = window.setTimeout(() => (busy.current = false), 1000);
     const transition = doc.startViewTransition(() => flushSync(apply));
-    running.current = transition;
     transition.ready
       .then(() => {
         root.animate(
@@ -82,9 +77,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       })
       .catch(() => {});
     transition.finished.finally(() => {
-      if (running.current === transition) running.current = null;
+      window.clearTimeout(release);
+      busy.current = false;
       done();
     });
+    return true;
   }, []);
 
   useEffect(() => {

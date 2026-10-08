@@ -33,7 +33,7 @@ export const ACHIEVEMENTS: { id: AchievementId; title: string; detail: string; h
   { id: "inspector", title: "Inspector", detail: "Called hire() from the console.", hint: "Developers always open the console first." },
   { id: "sudo", title: "Nice try", detail: "yunus is not in the sudoers file. This incident will be reported.", hint: "Type a famous admin command anywhere on the page." },
   { id: "polyglot", title: "Polyglot", detail: "Got greeted in five languages.", hint: "Say hi to the photo. Then say it again." },
-  { id: "indecisive", title: "Indecisive", detail: "Switched the theme eight times in a row.", hint: "Light or dark? Can't decide? Take your time between switches, the bulb is fragile." },
+  { id: "indecisive", title: "Indecisive", detail: "Switched the theme eight times in a row.", hint: "Light or dark? Can't decide? Take a few seconds between switches, the bulb is fragile." },
   { id: "snake", title: "Snake charmer", detail: "Scored 10 in Packet Snake.", hint: "Packet Snake: score 10. Golden hotfixes are worth 3." },
   { id: "whack", title: "Bug bounty", detail: "Scored 20 in Whack-a-Bug.", hint: "Whack-a-Bug: score 20. Keep a combo going and leave the features alone." },
   { id: "memory", title: "Total recall", detail: "Finished Stack Match in 14 moves or fewer.", hint: "Stack Match rewards a good memory: 14 moves or fewer." },
@@ -42,7 +42,7 @@ export const ACHIEVEMENTS: { id: AchievementId; title: string; detail: string; h
   { id: "merge", title: "Merge master", detail: "Reached a 256 commit in Merge Conflict.", hint: "Merge Conflict: merge your way up to 256." },
   { id: "typer", title: "Shell wizard", detail: "Typed 6 commands in 30 seconds in Terminal Typer.", hint: "Terminal Typer: six commands in 30 seconds." },
   { id: "duelist", title: "Duelist", detail: "Beat the bot in the KPSS Düello demo.", hint: "One of the project cards has a sword on it. Win the duel." },
-  { id: "bulb", title: "Power surge", detail: "Blew the bulb by switching the theme too fast. Somebody had to come and replace it.", hint: "The theme switch is a light bulb. Light bulbs don't like being flicked in a hurry." },
+  { id: "bulb", title: "Power surge", detail: "Blew the bulb by switching the theme three times in a row. Somebody had to come and replace it.", hint: "The theme switch is a light bulb. Light bulbs don't like being flicked in a hurry." },
   { id: "airdefense", title: "Air defense", detail: "Cleared a whole wave of targets with the ENGEREK turret.", hint: "One project defends the skies. Fire its turret and leave nothing standing." },
   { id: "collector", title: "Word collector", detail: "Emptied the review jar in the Kelime Kavanozu demo.", hint: "One of the project cards has a jar on it. Empty it." },
 ];

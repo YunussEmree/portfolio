@@ -191,26 +191,24 @@ export default function BulbToggle() {
   const [phase, setPhase] = useState<Phase>("ok");
   const [screwed, setScrewed] = useState(0);
   const [janitor, setJanitor] = useState(false);
-  const clicks = useRef<number[]>([]);
+  const switches = useRef<number[]>([]);
   const button = useRef<HTMLButtonElement>(null);
 
-  const [sparks, setSparks] = useState(0);
   const press = (r: DOMRect) => {
+    if (phase !== "ok") return; // a blown bulb waits for the janitor
     const origin = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    if (phase !== "ok") {
-      // No cooldown: the bare socket still works, it just sparks.
-      setSparks((n) => n + 1);
-      return toggle(origin);
-    }
+    if (!toggle(origin)) return; // still animating the last switch: the click is ignored
     const now = Date.now();
-    clicks.current = [...clicks.current.filter((t) => now - t < 2500), now];
-    if (clicks.current.length < 5) return toggle(origin);
+    switches.current = [...switches.current.filter((t) => now - t < 3500), now];
+    if (switches.current.length < 3) return;
 
-    // Five switches in a hurry: the bulb blows and the lights go out.
-    clicks.current = [];
+    // Three switches in a hurry: the bulb blows, and once the switch has finished the lights go out.
+    switches.current = [];
     setPhase("exploding");
-    if (theme === "light") toggle(origin);
     unlock("bulb");
+    window.setTimeout(() => {
+      if (!document.documentElement.classList.contains("dark")) toggle(origin);
+    }, 650);
     window.setTimeout(() => setPhase("broken"), 800);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       window.setTimeout(() => {
@@ -220,21 +218,6 @@ export default function BulbToggle() {
     } else window.setTimeout(() => setJanitor(true), 1600);
   };
 
-  // While a theme transition runs, Chrome sends clicks to <html> instead of the button underneath, which felt like a
-  // cooldown. Clicks that land on the bulb's spot are passed on, so you can switch as fast as you like.
-  const pressRef = useRef(press);
-  pressRef.current = press;
-  useEffect(() => {
-    const onWindowClick = (e: MouseEvent) => {
-      const b = button.current;
-      if (!b || (e.target instanceof Node && b.contains(e.target))) return;
-      const r = b.getBoundingClientRect();
-      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) pressRef.current(r);
-    };
-    window.addEventListener("click", onWindowClick, true);
-    return () => window.removeEventListener("click", onWindowClick, true);
-  }, []);
-
   const mode: Mode = phase === "ok" ? (theme === "light" ? "on" : "off") : "broken";
 
   return (
@@ -243,18 +226,14 @@ export default function BulbToggle() {
         ref={button}
         type="button"
         onClick={(e) => press(e.currentTarget.getBoundingClientRect())}
-        className="group relative grid size-9 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg"
+        aria-disabled={phase !== "ok"}
+        className="group relative grid size-9 place-items-center rounded-full text-muted transition hover:bg-surface-2 hover:text-fg aria-disabled:cursor-not-allowed"
         aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       >
         <span className="transition-transform duration-300 group-hover:scale-110 group-active:scale-90">
           <Bulb mode={mode} screwed={screwed} />
         </span>
         {phase === "exploding" && <Explosion />}
-        {phase === "broken" && sparks > 0 && (
-          <svg key={sparks} viewBox="0 0 24 24" className="bulb-spark pointer-events-none absolute left-1/2 top-0 size-5 -translate-x-1/2 text-[#ffd54a]" aria-hidden="true">
-            <path d="M12 2v5M6 5l3 3M18 5l-3 3M4 11h4M16 11h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        )}
       </button>
       {janitor && button.current && (
         <Janitor
